@@ -1,0 +1,3 @@
+:MCHPB
+    node .
+goto MCHPB:
