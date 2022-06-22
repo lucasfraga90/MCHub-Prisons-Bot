@@ -13,6 +13,7 @@ if %ERRORLEVEL% GTR 0 (
     SET outcomeMessage=[MCHPB] Successfully installed dependencies. You can close this window manually or by pressing any key.
 )
 ECHO ============================================================================================================
+TITLE MCHub Prisons Bot Installer - Custom Coded By QimieGames
 ECHO.
 ECHO.
 ECHO.
