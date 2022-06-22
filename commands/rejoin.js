@@ -1,12 +1,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
-
 	data: new SlashCommandBuilder()
 		.setName('rejoin')
 		.setDescription('Make the bot rejoin Atlantic Prisons. [Trusted Command]')
 		.setDMPermission(false),
-		
 	async execute(interaction, updatedConfigValue, ingameBot){
 
 		const discordBotAdmin = updatedConfigValue.roles_id.admin;

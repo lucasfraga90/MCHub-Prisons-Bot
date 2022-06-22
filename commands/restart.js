@@ -1,12 +1,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
-
 	data: new SlashCommandBuilder()
 		.setName('restart')
 		.setDescription('Restart the bot. [Trusted Command]')
 		.setDMPermission(false),
-		
 	async execute(interaction, updatedConfigValue, discordBot, ingameBot){
 
 		const discordBotAdmin = updatedConfigValue.roles_id.admin;
@@ -28,7 +26,6 @@ module.exports = {
 				try{
 					ingameBot.quit();
 					console.log('[MCHPB] Disconnected from the MCHub.COM.');
-					return true;
 				} catch {
 					console.log('[MCHPB] Error occured while disconnecting from MCHub.COM! Shutting down the bot.');
 					process.exit(0);

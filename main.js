@@ -2,24 +2,26 @@ require('dotenv').config();
 
 const nodeFS = require('fs');
 
-const mineflayer = require('mineflayer');
-
 const DiscordJS = require('discord.js');
+
+const mineflayer = require('mineflayer');
 
 const { REST } = require('@discordjs/rest');
 
-const { Routes } = require('discord-api-types/v9');
+const { Routes } = require('discord-api-types/v10');
+
+const consoleInput = require('readline').createInterface({ input: process.stdin });
 
 const commandsDIR ='./commands/';
 
-const defaultEnvLayout =
+const defaultEnvFileLayout =
 
 `DISCORD_BOT_TOKEN=DISCORD_BOT_TOKEN_HERE
 INGAME_BOT_EMAIL=INGAME_BOT_EMAIL_HERE
 INGAME_BOT_PASSWORD=INGAME_BOT_PASSWORD_HERE
 INGAME_BOT_AUTH_WAY=mojang`;
 
-const defaultConfigLayout = 
+const defaultConfigFileLayout = 
 
 {
   discord_bot: {
@@ -46,9 +48,50 @@ const defaultConfigLayout =
       dungeon_boss_ping: "1",
       dungeon_ping: "1",
       beacon_meteor_ping: "1",
-      bloodbath_ping: "1",
+      bloodbath_ping: "1"
   }
 };
+
+const discordBotIntents = 
+
+[
+    DiscordJS.Intents.FLAGS.GUILD_MEMBERS,
+    DiscordJS.Intents.FLAGS.GUILD_MESSAGES,
+    DiscordJS.Intents.FLAGS.GUILDS
+];
+
+const discordBotPartials =
+
+[
+    'CHANNEL',
+    'GUILD_MEMBER',
+    'MESSAGE',
+    'USER'
+];
+
+const discordBot = new DiscordJS.Client({ intents: discordBotIntents, partials: discordBotPartials });
+
+discordBot.commands = new DiscordJS.Collection();
+
+let isDiscordBotReady = false;
+
+let isIngameBotReady = false;
+
+let constantConfigValue;
+
+let ingameBot;
+
+consoleInput.on('line', async inputFromConsole => {
+    if(isIngameBotReady === true){
+        try{
+        ingameBot.chat(inputFromConsole);
+        } catch {
+            console.log('[MCHPB] Error occured while sending chat message.');
+        }
+    } else {
+        console.log('[MCHPB] The ingame bot is not ready!');
+    }
+});
 
 function doesCommandsDIRExists(){
     console.log("[MCHPB] Loading commands' directory...");
@@ -114,7 +157,7 @@ function doesEnvFileExists(){
 function generateEnvFile(){
     console.log('[MCHPB] Generating a new .env file...');
     try{
-        nodeFS.appendFileSync('.env', defaultEnvLayout, 'utf-8');
+        nodeFS.appendFileSync('.env', defaultEnvFileLayout, 'utf-8');
         return true;
     } catch {
         return false;
@@ -140,7 +183,7 @@ function isEnvFileValid(){
 function reformatEnvFile(){
     console.log('[MCHPB] Reformatting .env file...');
     try{
-        nodeFS.writeFileSync('.env', defaultEnvLayout, 'utf-8');
+        nodeFS.writeFileSync('.env', defaultEnvFileLayout, 'utf-8');
         return true;
     } catch {
         return false;
@@ -160,14 +203,14 @@ function doesConfigFileExists(){
 function generateConfigFile(){
     console.log('[MCHPB] Generating a new config file...');
     try{
-        nodeFS.appendFileSync('config.json', JSON.stringify(defaultConfigLayout, null, 4), 'utf-8');
+        nodeFS.appendFileSync('config.json', JSON.stringify(defaultConfigFileLayout, null, 4), 'utf-8');
         return true;
     } catch {
         return false;
     }
 }
 
-function isConfigFileValid(){ //NEEDS A REWRITE
+function isConfigFileValid(){
     try{
 
         const updatedConfigValue = JSON.parse(nodeFS.readFileSync('config.json', 'utf-8'));
@@ -185,7 +228,7 @@ function isConfigFileValid(){ //NEEDS A REWRITE
 function reformatConfigFile(){
     console.log('[MCHPB] Reformatting config file...');
     try{
-        nodeFS.writeFileSync('.env', JSON.stringify(defaultConfigLayout, null, 4), 'utf-8');
+        nodeFS.writeFileSync('.env', JSON.stringify(defaultConfigFileLayout, null, 4), 'utf-8');
         return true;
     } catch {
         return false;
@@ -254,35 +297,6 @@ function validateEssentials(){
         return false;
     }
 }
-
-const discordBotIntents = 
-
-[
-    DiscordJS.Intents.FLAGS.GUILD_MEMBERS,
-    DiscordJS.Intents.FLAGS.GUILD_MESSAGES,
-    DiscordJS.Intents.FLAGS.GUILDS
-];
-
-const discordBotPartials =
-
-[
-    'CHANNEL',
-    'GUILD_MEMBER',
-    'MESSAGE',
-    'USER'
-];
-
-const discordBot = new DiscordJS.Client({ intents: discordBotIntents, partials: discordBotPartials });
-
-discordBot.commands = new DiscordJS.Collection();
-
-let isDiscordBotReady = false;
-
-let isIngameBotReady = false;
-
-let constantConfigValue;
-
-let ingameBot;
 
 function registerSlashCommands(){
     console.log('[MCHPB] Synchronizing slash commands...');
@@ -407,7 +421,7 @@ discordBot.on('interactionCreate', async interaction => {
             break;
         case 'restart':
             discordSlashCommand.execute(interaction, constantConfigValue, discordBot, ingameBot);
-            logCommandUsage(interaction, true);
+            logCommandUsage(interaction);
             break;
     }
 });
@@ -416,54 +430,66 @@ ingameBot.once('login', async onceLoginIngameBot => {
     console.log('[MCHPB] Connecting to MCHUB.COM...');
 });
 
-function registerChatPattern(){ //MAKE SURE THIS WORK
+function registerChatPattern(){
+    console.log('[MCHPB] Registering chat patterns...');
+    try{
 
-    const regexPatterns = {
-        pve_boss_spawned: new RegExp(/^BEACON \» The \[([A-Za-z]+)\] ([A-Za-z ]+) has spawned\! Go to \/warp beacon to defeat it\! $/, 'm'),
-        dungeon_opened: new RegExp(/^Dungeons \» A new dungeon has opened\! You can join the dungeon by typing \/dungeon\!$/, 'm'),
-        dungeon_boss_spawned: new RegExp(/^Dungeons \» The dungeon boss has spawned\! There are ([A-Za-z0-9 ]+) left before the dungeon closes\!$/, 'm'),
-        beacon_meteor_spawned: new RegExp(/^BEACON \» A meteor has entered the atmosphere and is about to make impact\! Go to \/warp beacon to mine it up\!$/, 'm'),
-        bloodbath_started: new RegExp(/^BLOODBATH \» Bloodbath has started\! \/warp pvp$/, 'm')
-    };
+        const regexPatterns = {
+            pve_boss_spawned: new RegExp(/^BEACON \» The \[([A-Za-z]+)\] ([A-Za-z ]+) has spawned\! Go to \/warp beacon to defeat it\! $/, 'm'),
+            dungeon_opened: new RegExp(/^Dungeons \» A new dungeon has opened\! You can join the dungeon by typing \/dungeon\!$/, 'm'),
+            dungeon_boss_spawned: new RegExp(/^Dungeons \» The dungeon boss has spawned\! There are ([A-Za-z0-9 ]+) left before the dungeon closes\!$/, 'm'),
+            beacon_meteor_spawned: new RegExp(/^BEACON \» A meteor has entered the atmosphere and is about to make impact\! Go to \/warp beacon to mine it up\!$/, 'm'),
+            bloodbath_started: new RegExp(/^BLOODBATH \» Bloodbath has started\! \/warp pvp$/, 'm')
+        };
 
-    Object.keys(regexPatterns).forEach(regexPatternName => {
-        ingameBot.addChatPattern(regexPatternName, regexPatterns[regexPatternName], { repeat: true, parse: true });
-        ingameBot.addChatPatternSet;
-    });
+        Object.keys(regexPatterns).forEach(regexPatternName => {
+            ingameBot.addChatPattern(regexPatternName, regexPatterns[regexPatternName], { repeat: true, parse: true });
+            ingameBot.addChatPatternSet;
+        });
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 ingameBot.once('spawn', async onceSpawnIngameBot => {
     console.log('[MCHPB] Connected to MCHub.COM.');
-    registerChatPattern();
-    ingameBot.chat('/server atlantic11');
+    if(registerChatPattern() === true){
+        console.log('[MCHPB] Successfully registered chat patterns.');
+        ingameBot.chat('/server atlantic11');
+    } else {
+        console.log('[MCHPB] Error occured while registering chat patterns!');
+        process.exit(0);
+    }
 });
 
-ingameBot.once('spawn', async onceSpawnIngameBot => {
+ingameBot.on('spawn', async onSpawnIngameBot => {
     isIngameBotReady = true;
 });
 
 ingameBot.on('message', async chatMSGRaw => {
-
     if(isIngameBotReady === false || isDiscordBotReady === false) return;
 
     const guildID = constantConfigValue.discord_bot.guild_id;
 
     const ingameChatChannelID = constantConfigValue.discord_channels.ingame_chat;
 
-    if(constantConfigValue.features.discord_ingame_chat === 'true'){
-        if(chatMSGRaw.toString().length >= 5){
-            if(discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID) != undefined){
-                if(discordBot.guilds.cache.get(guildID).me.permissionsIn(ingameChatChannelID).has('VIEW_CHANNEL') === true){
-                    if(discordBot.guilds.cache.get(guildID).me.permissionsIn(ingameChatChannelID).has('SEND_MESSAGES') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).send('```' + chatMSGRaw + '```');
+    async () => {
+        if(constantConfigValue.features.discord_ingame_chat === 'true'){
+            if(chatMSGRaw.toString().length >= 5){
+                if(discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID) != undefined){
+                    if(discordBot.guilds.cache.get(guildID).me.permissionsIn(ingameChatChannelID).has('VIEW_CHANNEL') === true){
+                        if(discordBot.guilds.cache.get(guildID).me.permissionsIn(ingameChatChannelID).has('SEND_MESSAGES') === true){
+                            discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).send('```' + chatMSGRaw + '```');
+                        } else {
+                            console.log('[MCHPB] Error occured while sending chat messages in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).name + '!');
+                        }
                     } else {
                         console.log('[MCHPB] Error occured while sending chat messages in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).name + '!');
                     }
                 } else {
-                    console.log('[MCHPB] Error occured while sending chat messages in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).name + '!');
+                    console.log('[MCHPB] Error occured while finding ingame chat channel!');
                 }
-            } else {
-                console.log('[MCHPB] Error occured while finding ingame chat channel!');
             }
         }
     }
@@ -472,7 +498,7 @@ ingameBot.on('message', async chatMSGRaw => {
     }
 });
 
-ingameBot.on('chat:pve_boss_spawned', async pveBossDetails => { //ADD WITCH BOSS NAME
+ingameBot.on('chat:pve_boss_spawned', async pveBossDetails => {
     if(isIngameBotReady === false || isDiscordBotReady === false) return;
 
     const guildID = constantConfigValue.discord_bot.guild_id;
@@ -543,37 +569,6 @@ ingameBot.on('chat:pve_boss_spawned', async pveBossDetails => { //ADD WITCH BOSS
     }
 });
 
-ingameBot.on('chat:dungeon_opened', async () => {
-    if(isIngameBotReady === false || isDiscordBotReady === false) return;
-
-    const guildID = constantConfigValue.discord_bot.guild_id;
-    
-    const dungeonOpenedAlertChannelID = constantConfigValue.discord_channels.dungeon;
-
-    const dungeonOpenedPingRoleID = constantConfigValue.roles_id.dungeon_ping;
-
-    const dungeonOpenedEmbed = new DiscordJS.MessageEmbed()
-        .setColor('#eb8334')
-        .setTitle('DUNGEON OPENED')
-        .setThumbnail('https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/322/skull-and-crossbones_2620-fe0f.png')
-        .setTimestamp()
-        .setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
-    
-    if(discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID) != undefined){
-        if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dungeonOpenedAlertChannelID).has('VIEW_CHANNEL') === true){
-            if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dungeonOpenedAlertChannelID).has('SEND_MESSAGES') === true){
-                discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID).send({ content: `|| <@&${dungeonOpenedPingRoleID}> ||`, embeds: [dungeonOpenedEmbed] });
-            } else {
-                console.log('[MCHPB] Error occured while sending chat messages in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID).name + '!');
-            }
-        } else {
-            console.log('[MCHPB] Error occured while viewing #' + discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID).name + '!');
-        }
-    } else {
-        console.log('[MCHPB] Error occured while finding dungeon opened alert channel!');
-    }
-});
-
 ingameBot.on('chat:dungeon_boss_spawned', async (dungeonEndTime) => {
     if(isIngameBotReady === false || isDiscordBotReady === false) return;
 
@@ -603,6 +598,37 @@ ingameBot.on('chat:dungeon_boss_spawned', async (dungeonEndTime) => {
         }
     } else {
         console.log('[MCHPB] Error occured while finding dungeon boss spawned alert channel!');
+    }
+});
+
+ingameBot.on('chat:dungeon_opened', async () => {
+    if(isIngameBotReady === false || isDiscordBotReady === false) return;
+
+    const guildID = constantConfigValue.discord_bot.guild_id;
+    
+    const dungeonOpenedAlertChannelID = constantConfigValue.discord_channels.dungeon;
+
+    const dungeonOpenedPingRoleID = constantConfigValue.roles_id.dungeon_ping;
+
+    const dungeonOpenedEmbed = new DiscordJS.MessageEmbed()
+        .setColor('#eb8334')
+        .setTitle('DUNGEON OPENED')
+        .setThumbnail('https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/322/skull-and-crossbones_2620-fe0f.png')
+        .setTimestamp()
+        .setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
+    
+    if(discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID) != undefined){
+        if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dungeonOpenedAlertChannelID).has('VIEW_CHANNEL') === true){
+            if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dungeonOpenedAlertChannelID).has('SEND_MESSAGES') === true){
+                discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID).send({ content: `|| <@&${dungeonOpenedPingRoleID}> ||`, embeds: [dungeonOpenedEmbed] });
+            } else {
+                console.log('[MCHPB] Error occured while sending chat messages in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID).name + '!');
+            }
+        } else {
+            console.log('[MCHPB] Error occured while viewing #' + discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID).name + '!');
+        }
+    } else {
+        console.log('[MCHPB] Error occured while finding dungeon opened alert channel!');
     }
 });
 
