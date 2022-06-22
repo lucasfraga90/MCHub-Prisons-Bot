@@ -10,8 +10,6 @@ const { REST } = require('@discordjs/rest');
 
 const { Routes } = require('discord-api-types/v10');
 
-const consoleInput = require('readline').createInterface({ input: process.stdin });
-
 const commandsDIR ='./commands/';
 
 const defaultEnvFileLayout =
@@ -66,7 +64,9 @@ const discordBotPartials =
     'CHANNEL',
     'GUILD_MEMBER',
     'MESSAGE',
-    'USER'
+    'USER',
+    'REACTION',
+    'GUILD_SCHEDULED_EVENT'
 ];
 
 const discordBot = new DiscordJS.Client({ intents: discordBotIntents, partials: discordBotPartials });
@@ -80,18 +80,6 @@ let isIngameBotReady = false;
 let constantConfigValue;
 
 let ingameBot;
-
-consoleInput.on('line', async inputFromConsole => {
-    if(isIngameBotReady === true){
-        try{
-        ingameBot.chat(inputFromConsole);
-        } catch {
-            console.log('[MCHPB] Error occured while sending chat message.');
-        }
-    } else {
-        console.log('[MCHPB] The ingame bot is not ready!');
-    }
-});
 
 function doesCommandsDIRExists(){
     console.log("[MCHPB] Loading commands' directory...");
@@ -119,28 +107,20 @@ function removeInvalidCommandFile(commandFile){
 function isCommandFilesOkay(){
     console.log("[MCHPB] Loading command's files...");
 
-    const commandDIRFiles = nodeFS.readdirSync(commandsDIR);
+    const currentCommandDIRFiles = nodeFS.readdirSync(commandsDIR);
 
     const defaultCommandFiles = ['help.js', 'restart.js', 'rejoin.js'];
-
-    let commandFiles = [];
     
-    for (const commandFile of commandDIRFiles){
-        if(defaultCommandFiles.includes(commandFile) === false){
-            if(removeInvalidCommandFile(commandFile) === true){
-                console.log(`[MCHPB] Successfully removed ${commandFile}.`);
+    for (const currentCommandFileName of currentCommandDIRFiles){
+        if(defaultCommandFiles.includes(currentCommandFileName) === false){
+            if(removeInvalidCommandFile(currentCommandFileName) === true){
+                console.log(`[MCHPB] Successfully removed ${currentCommandFileName}.`);
             } else {
-                console.log(`[MCHPB] Error occured while removing ${commandFile}! Please reinstall the bot.`);
+                console.log(`[MCHPB] Error occured while removing ${currentCommandFileName}! Please reinstall the bot.`);
+                return false;
             }
-        } else {
-            commandFiles.push(commandFile);
         }
     }
-    commandFiles.forEach(commandFileName => {
-        if(defaultCommandFiles.includes(commandFileName) === false){
-            return false;
-        }
-    });
     return true;
 }
 
@@ -218,6 +198,40 @@ function isConfigFileValid(){
         if(updatedConfigValue.discord_bot.guild_id === undefined || updatedConfigValue.discord_bot.client_id === undefined || updatedConfigValue.discord_channels.pve_boss === undefined || updatedConfigValue.discord_channels.dungeon_boss === undefined || updatedConfigValue.discord_channels.dungeon === undefined || updatedConfigValue.discord_channels.beacon_meteor === undefined || updatedConfigValue.discord_channels.bloodbath === undefined || updatedConfigValue.discord_channels.ingame_chat === undefined || updatedConfigValue.discord_channels.logs === undefined || updatedConfigValue.roles_id.admin === undefined || updatedConfigValue.roles_id.trusted === undefined || updatedConfigValue.roles_id.pve_boss_ping === undefined || updatedConfigValue.features.discord_ingame_chat === undefined || updatedConfigValue.features.console_ingame_chat === undefined || updatedConfigValue.roles_id.dungeon_boss_ping === undefined || updatedConfigValue.roles_id.dungeon_ping === undefined || updatedConfigValue.roles_id.beacon_meteor_ping === undefined || updatedConfigValue.roles_id.bloodbath_ping === undefined){
             return false;
         } else {
+
+            let defaultConfigSettings = [];
+
+            let currentConfigSettings = [];
+
+            Object.keys(defaultConfigFileLayout.features).forEach(defaultFeatureSetting => {
+                defaultConfigSettings.push(defaultFeatureSetting);
+            });
+            Object.keys(defaultConfigFileLayout.discord_bot).forEach(defaultDiscordBotSetting => {
+                defaultConfigSettings.push(defaultDiscordBotSetting);
+            });
+            Object.keys(defaultConfigFileLayout.discord_channels).forEach(defaultDiscordChannelsSetting => {
+                defaultConfigSettings.push(defaultDiscordChannelsSetting);
+            });
+            Object.keys(defaultConfigFileLayout.roles_id).forEach(defaultRolesIDSetting => {
+                defaultConfigSettings.push(defaultRolesIDSetting);
+            });
+            Object.keys(updatedConfigValue.features).forEach(currentFeatureSetting => {
+                currentConfigSettings.push(currentFeatureSetting);
+            });
+            Object.keys(updatedConfigValue.discord_bot).forEach(currentDiscordBotSetting => {
+                currentConfigSettings.push(currentDiscordBotSetting);
+            });
+            Object.keys(updatedConfigValue.discord_channels).forEach(currentDiscordChannelsSetting => {
+                currentConfigSettings.push(currentDiscordChannelsSetting);
+            });
+            Object.keys(updatedConfigValue.roles_id).forEach(currentRolesIDSetting => {
+                currentConfigSettings.push(currentRolesIDSetting);
+            });
+            currentConfigSettings.forEach(currentConfigSetting => {
+                if(defaultConfigSettings.includes(currentConfigSetting) === false){
+                    return false;
+                }
+            });
             return true;
         }
     } catch {
@@ -228,7 +242,7 @@ function isConfigFileValid(){
 function reformatConfigFile(){
     console.log('[MCHPB] Reformatting config file...');
     try{
-        nodeFS.writeFileSync('.env', JSON.stringify(defaultConfigFileLayout, null, 4), 'utf-8');
+        nodeFS.writeFileSync('config.json', JSON.stringify(defaultConfigFileLayout, null, 4), 'utf-8');
         return true;
     } catch {
         return false;
@@ -249,7 +263,7 @@ function validateEssentials(){
                             console.log('[MCHPB] Successfully loaded config file.');
                             return true;
                         } else {
-                            console.log('[MCHPB] Invalid config file or its configuration!');
+                            console.log('[MCHPB] Invalid config file!');
                             if(reformatConfigFile() === true){
                                 console.log('[MCHPB] Successfully reformatted config file. Please configure it before running the bot again.');
                                 return false;
@@ -298,6 +312,68 @@ function validateEssentials(){
     }
 }
 
+function validateConfigValues(){
+    console.log('[MCHPB] Validating Discord roles & channels...');
+
+    const guildID = constantConfigValue.discord_bot.guild_id;
+
+    let discordRolesID = [];
+
+    discordBot.guilds.cache.get(guildID).roles.cache.forEach(discordRoleID => {
+        discordRolesID.push(discordRoleID.id);
+    });
+    Object.keys(constantConfigValue.features).forEach(featureName => {
+        switch(constantConfigValue.features[featureName]){
+            default:
+                return false;
+            case 'true':
+                break;
+            case 'false':
+                break;
+        }
+    });
+    Object.keys(constantConfigValue.discord_bot).forEach(discordSettingName => {
+        switch(discordSettingName){
+            default:
+                return false;
+            case 'guild_id':
+                if(discordBot.guilds.cache.has(guildID) === false){
+                    return false;
+                }
+                break;
+            case 'client_id':
+                if(constantConfigValue.discord_bot.client_id != discordBot.user.id){
+                    return false;
+                }
+                break;
+        }
+    });
+    Object.keys(constantConfigValue.discord_channels).forEach(discordChannelName => {
+
+        const discordChannelID = constantConfigValue.discord_channels[discordChannelName];
+
+        if(discordBot.guilds.cache.get(guildID).channels.cache.get(discordChannelID) === undefined){
+            return false;
+        } else {
+            if(discordBot.guilds.cache.get(guildID).me.permissionsIn(discordChannelID).has('VIEW_CHANNEL') === true){
+                if(discordBot.guilds.cache.get(guildID).me.permissionsIn(discordChannelID).has('SEND_MESSAGES') === false){
+                    console.log("[MCHPB] The bot can't send messages in #" + discordBot.guilds.cache.get(guildID).channels.cache.get(discordChannelID).name + ".");
+                    return false; 
+                }
+            } else {
+                console.log("[MCHPB] The bot can't see the channel #" + discordBot.guilds.cache.get(guildID).channels.cache.get(discordChannelID).name + ".");
+                return false;
+            }
+        }
+    });
+    Object.keys(constantConfigValue.roles_id).forEach(currentDiscordRoles => {
+        if(discordRolesID.includes(constantConfigValue[currentDiscordRoles]) === false){
+            return false;
+        }
+    });
+    return true;
+}
+
 function registerSlashCommands(){
     console.log('[MCHPB] Synchronizing slash commands...');
     try{
@@ -325,29 +401,27 @@ function registerSlashCommands(){
     }
 }
 
-if(validateEssentials() === true){
+function registerChatPattern(){
+    console.log('[MCHPB] Registering chat patterns...');
+    try{
 
-    constantConfigValue = JSON.parse(nodeFS.readFileSync('config.json', 'utf-8'));
+        const regexPatterns = {
+            pve_boss_spawned: new RegExp(/^BEACON \» The \[([A-Za-z]+)\] ([A-Za-z ]+) has spawned\! Go to \/warp beacon to defeat it\! $/, 'm'),
+            dungeon_opened: new RegExp(/^Dungeons \» A new dungeon has opened\! You can join the dungeon by typing \/dungeon\!$/, 'm'),
+            dungeon_boss_spawned: new RegExp(/^Dungeons \» The dungeon boss has spawned\! There are ([A-Za-z0-9 ]+) left before the dungeon closes\!$/, 'm'),
+            beacon_meteor_spawned: new RegExp(/^BEACON \» A meteor has entered the atmosphere and is about to make impact\! Go to \/warp beacon to mine it up\!$/, 'm'),
+            bloodbath_started: new RegExp(/^BLOODBATH \» Bloodbath has started\! \/warp pvp$/, 'm')
+        };
 
-    console.log('[MCHPB] Successfully loaded all essential directories & files.');
-    console.log('[MCHPB] Connecting to the Discord bot...');
-    discordBot.login(process.env.DISCORD_BOT_TOKEN).then(() => {
-        if(registerSlashCommands() === true){
-            console.log('[MCHPB] Successfully synchronized slash commands.')
-        } else {
-            console.log('[MCHPB] Error occured while synchronizing slash commands! Shutting down the bot.');
-            process.exit(0);
-        }});
-    ingameBot = mineflayer.createBot({ host: 'MCHub.COM', username: process.env.INGAME_BOT_EMAIL, password: process.env.INGAME_BOT_PASSWORD, auth: process.env.INGAME_BOT_AUTH_WAY });
-} else {
-    process.exit(0);
+        Object.keys(regexPatterns).forEach(regexPatternName => {
+            ingameBot.addChatPattern(regexPatternName, regexPatterns[regexPatternName], { repeat: true, parse: true });
+            ingameBot.addChatPatternSet;
+        });
+        return true;
+    } catch {
+        return false;
+    }
 }
-
-discordBot.on('ready', async onReadyDiscordBot => {
-    discordBot.user.setActivity('MCHub.COM - Atlantic Prisons', { type: 'STREAMING', url: 'https://www.twitch.tv/officialqimiegames' });
-    console.log('[MCHPB] Connected to the Discord bot.');
-    isDiscordBotReady = true;
-});
 
 async function logCommandUsage(interaction, commandResult){
 
@@ -397,6 +471,37 @@ async function logCommandUsage(interaction, commandResult){
     }
 }
 
+if(validateEssentials() === true){
+
+    constantConfigValue = JSON.parse(nodeFS.readFileSync('config.json', 'utf-8'));
+
+    console.log('[MCHPB] Successfully loaded all essential directories & files.');
+    console.log('[MCHPB] Connecting to the Discord bot...');
+    discordBot.login(process.env.DISCORD_BOT_TOKEN).then(() => {
+        if(validateConfigValues() === true){
+            console.log('[MCHPB] Successfully validated Discord roles & channels.');
+        } else {
+            console.log('[MCHPB] Error occured while validating Discord roles & channels! Please make sure you configure the config file correctly.');
+            process.exit(0);
+        }
+    }).then(() => {
+        if(registerSlashCommands() === true){
+            console.log('[MCHPB] Successfully synchronized slash commands.')
+        } else {
+            console.log('[MCHPB] Error occured while synchronizing slash commands! Shutting down the bot.');
+            process.exit(0);
+        }});
+    ingameBot = mineflayer.createBot({ host: 'MCHub.COM', username: process.env.INGAME_BOT_EMAIL, password: process.env.INGAME_BOT_PASSWORD, auth: process.env.INGAME_BOT_AUTH_WAY });
+} else {
+    process.exit(0);
+}
+
+discordBot.on('ready', async onReadyDiscordBot => {
+    discordBot.user.setActivity('MCHub.COM - Atlantic Prisons', { type: 'STREAMING', url: 'https://www.twitch.tv/officialqimiegames' });
+    console.log('[MCHPB] Connected to the Discord bot.');
+    isDiscordBotReady = true;
+});
+
 discordBot.on('interactionCreate', async interaction => {
 
     const discordSlashCommand = discordBot.commands.get(interaction.commandName);
@@ -429,28 +534,6 @@ discordBot.on('interactionCreate', async interaction => {
 ingameBot.once('login', async onceLoginIngameBot => {
     console.log('[MCHPB] Connecting to MCHUB.COM...');
 });
-
-function registerChatPattern(){
-    console.log('[MCHPB] Registering chat patterns...');
-    try{
-
-        const regexPatterns = {
-            pve_boss_spawned: new RegExp(/^BEACON \» The \[([A-Za-z]+)\] ([A-Za-z ]+) has spawned\! Go to \/warp beacon to defeat it\! $/, 'm'),
-            dungeon_opened: new RegExp(/^Dungeons \» A new dungeon has opened\! You can join the dungeon by typing \/dungeon\!$/, 'm'),
-            dungeon_boss_spawned: new RegExp(/^Dungeons \» The dungeon boss has spawned\! There are ([A-Za-z0-9 ]+) left before the dungeon closes\!$/, 'm'),
-            beacon_meteor_spawned: new RegExp(/^BEACON \» A meteor has entered the atmosphere and is about to make impact\! Go to \/warp beacon to mine it up\!$/, 'm'),
-            bloodbath_started: new RegExp(/^BLOODBATH \» Bloodbath has started\! \/warp pvp$/, 'm')
-        };
-
-        Object.keys(regexPatterns).forEach(regexPatternName => {
-            ingameBot.addChatPattern(regexPatternName, regexPatterns[regexPatternName], { repeat: true, parse: true });
-            ingameBot.addChatPatternSet;
-        });
-        return true;
-    } catch {
-        return false;
-    }
-}
 
 ingameBot.once('spawn', async onceSpawnIngameBot => {
     console.log('[MCHPB] Connected to MCHub.COM.');
