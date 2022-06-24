@@ -550,35 +550,42 @@ ingameBot.on('spawn', async onSpawnIngameBot => {
     isIngameBotReady = true;
 });
 
-ingameBot.on('message', async chatMSGRaw => {
-    if(isIngameBotReady === false || isDiscordBotReady === false) return;
-
+async function logIngameChatToDiscord(chatMSG){
     const guildID = constantConfigValue.discord_bot.guild_id;
 
     const ingameChatChannelID = constantConfigValue.discord_channels.ingame_chat;
-
-    async () => {
-        if(constantConfigValue.features.discord_ingame_chat === 'true'){
-            if(chatMSGRaw.toString().length >= 5){
-                if(discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID) != undefined){
-                    if(discordBot.guilds.cache.get(guildID).me.permissionsIn(ingameChatChannelID).has('VIEW_CHANNEL') === true){
-                        if(discordBot.guilds.cache.get(guildID).me.permissionsIn(ingameChatChannelID).has('SEND_MESSAGES') === true){
-                            discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).send('```' + chatMSGRaw + '```');
-                        } else {
-                            console.log('[MCHPB] Error occured while sending chat messages in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).name + '!');
-                        }
+    
+    if(constantConfigValue.features.discord_ingame_chat === 'true'){
+        if(chatMSG.toString().length >= 5){
+            if(discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID) != undefined){
+                if(discordBot.guilds.cache.get(guildID).me.permissionsIn(ingameChatChannelID).has('VIEW_CHANNEL') === true){
+                    if(discordBot.guilds.cache.get(guildID).me.permissionsIn(ingameChatChannelID).has('SEND_MESSAGES') === true){
+                        discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).send('```' + chatMSG + '```');
                     } else {
                         console.log('[MCHPB] Error occured while sending chat messages in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).name + '!');
                     }
                 } else {
-                    console.log('[MCHPB] Error occured while finding ingame chat channel!');
+                    console.log('[MCHPB] Error occured while sending chat messages in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).name + '!');
                 }
+            } else {
+                console.log('[MCHPB] Error occured while finding ingame chat channel!');
             }
         }
     }
+}
+
+async function logIngameChatToConsole(chatMSG){
     if(constantConfigValue.features.console_ingame_chat === 'true'){
-        console.log(chatMSGRaw.toAnsi());
+        console.log(chatMSG.toAnsi());
     }
+}
+
+ingameBot.on('message', async (chatMSGRaw, chatType) => {
+    if(isIngameBotReady === false || isDiscordBotReady === false) return;
+    
+    logIngameChatToConsole(chatMSGRaw).then(async () => {
+        logIngameChatToDiscord(chatMSGRaw);
+    });
 });
 
 ingameBot.on('chat:pve_boss_spawned', async pveBossDetails => {
