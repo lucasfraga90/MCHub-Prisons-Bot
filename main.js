@@ -81,6 +81,8 @@ let constantConfigValue;
 
 let ingameBot;
 
+let consoleChatBox = require('readline').createInterface({ input: process.stdin });
+
 function doesCommandsDIRExists(){
     console.log("[MCHPB] Loading commands' directory...");
     try{
@@ -496,6 +498,10 @@ if(validateEssentials() === true){
     process.exit(0);
 }
 
+consoleChatBox.on('line', async consoleChatBoxInput => {
+    ingameBot.chat(consoleChatBoxInput);
+});
+
 discordBot.on('ready', async onReadyDiscordBot => {
     discordBot.user.setActivity('MCHub.COM - Atlantic Prisons', { type: 'STREAMING', url: 'https://www.twitch.tv/officialqimiegames' });
     console.log('[MCHPB] Connected to the Discord bot.');
@@ -581,7 +587,7 @@ async function logIngameChatToConsole(chatMSG){
 }
 
 ingameBot.on('message', async (chatMSGRaw, chatType) => {
-    if(isIngameBotReady === false || isDiscordBotReady === false) return;
+    if(isIngameBotReady === false || isDiscordBotReady === false || chatType === 'game_info') return;
     
     logIngameChatToConsole(chatMSGRaw).then(async () => {
         logIngameChatToDiscord(chatMSGRaw);
@@ -800,10 +806,10 @@ discordBot.on('shardError', async discordBotError => {
     process.exit(0);
 });
 
-process.on('unhandledRejection', proccessError => {
+process.on('unhandledRejection', async proccessError => {
     process.exit(0);
 });
 
-process.on('uncaughtException', proccessError => {
+process.on('uncaughtException', async proccessError => {
     process.exit(0);
 });
