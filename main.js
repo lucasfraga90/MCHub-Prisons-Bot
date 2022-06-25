@@ -783,3 +783,27 @@ ingameBot.on('chat:bloodbath_started', async () => {
         console.log('[MCHPB] Error occured while finding bloodbath started alert channel!');
     }
 });
+
+ingameBot.on('error', async ingameBotError => {
+    process.exit(0);
+});
+
+ingameBot.on('kicked', async ingameBotKicked => {
+    process.exit(0);
+});
+
+discordBot.on('error', async discordBotError => {
+    process.exit(0);
+});
+
+discordBot.on('shardError', async discordBotError => {
+    process.exit(0);
+});
+
+process.on('unhandledRejection', proccessError => {
+    process.exit(0);
+});
+
+process.on('uncaughtException', proccessError => {
+    process.exit(0);
+});

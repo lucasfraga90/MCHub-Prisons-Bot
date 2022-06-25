@@ -10,12 +10,12 @@
 #### - Log Ingame Messages To Discord.
 
 ## TO-DO:
-#### - Add Errors Handler.
 #### - Add Witch Boss' Name.
 #### - Add Internal Command.
 #### - Add Ability To Chat From Console.
 #### - Fix Restart Command.
 #### - Fix Tips Being Logged As Ingame Chat.
+#### - Re-Write Everything After Finish The Bot.
 
 ## [INSTALLATION](https://www.youtube.com/playlist?list=PLwsD_Qp4brFf3UgPyncp5ff0CndvL1J0Q "YouTube Playlist"):
 #### 1. Download the installer [here](https://github.com/QimieGames/MCHub-Prisons-Bot/releases "MCHub Prisons Bot Installer Download Page").
