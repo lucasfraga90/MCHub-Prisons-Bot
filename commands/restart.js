@@ -5,35 +5,35 @@ module.exports = {
 		.setName('restart')
 		.setDescription('Restart the bot. [Trusted Command]')
 		.setDMPermission(false),
-	async execute(interaction, updatedConfigValue, discordBot, ingameBot){
+	async execute(interaction, updatedConfigValue, discordBot, ingameBot, logCommandUsage, isDiscordBotReady, isIngameBotReady){
+		try {
 
-		const discordBotAdmin = updatedConfigValue.roles_id.admin;
+			const discordBotAdmin = updatedConfigValue.roles_id.admin;
 
-		const discordBotTrusted = updatedConfigValue.roles_id.trusted;
+			const discordBotTrusted = updatedConfigValue.roles_id.trusted;
 
-		if(interaction.member.roles.cache.some(discordRole => discordRole.id === discordBotAdmin) === true || interaction.member.roles.cache.some(discordRole => discordRole.id === discordBotTrusted) === true){
-			await interaction.editReply({content: '```Restarting...```', ephemeral: true }).then(() => {
-				console.log('[MCHPB] Restarting the bot...');
-				console.log('[MCHPB] Disconnecting from the Discord bot...');
-				try{
-					discordBot.destroy();
-					console.log('[MCHPB] Disconnected from the Discord bot.');
-				} catch {
-					console.log('[MCHPB] Error occured while disconnecting from the Discord bot! Shutting down the bot.');
-					process.exit(0);
-				}
-				console.log('[MCHPB] Disconnecting from MCHUB.COM...');
-				try{
-					ingameBot.quit();
-					console.log('[MCHPB] Disconnected from the MCHub.COM.');
-				} catch {
-					console.log('[MCHPB] Error occured while disconnecting from MCHub.COM! Shutting down the bot.');
-					process.exit(0);
-				}
-				process.exit(0);});
-		} else {
-			await interaction.editReply({ content: '```You are not allowed to run this command!```', ephemeral: true });
-			return false;
+			console.log('[MCHPB] Restarting the bot...');
+			if(interaction.member.roles.cache.some(discordRole => discordRole.id === discordBotAdmin) === true || interaction.member.roles.cache.some(discordRole => discordRole.id === discordBotTrusted) === true){
+				await interaction.editReply({content: '```Restarting...```', ephemeral: true });
+				await logCommandUsage(interaction, true);
+				await discordBot.destroy();
+				await ingameBot.end();
+				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
+			} else {
+				await interaction.editReply({ content: '```You are not allowed to run this command!```', ephemeral: true });
+				await logCommandUsage(interaction, false);
+				return isDiscordBotReady = true;
+			}
+		} catch {
+			console.log('[MCHPB] Error occured while running the restart command! Restarting the bot...');
+			try {
+				await discordBot.destroy();
+				await ingameBot.end;
+				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
+			} catch {
+				console.log('[MCHPB] Error occured while restarting the bot properly!');
+				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
+			}
 		}
 	},
 };

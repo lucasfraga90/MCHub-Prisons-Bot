@@ -7,25 +7,36 @@ module.exports = {
 		.setName('help')
 		.setDescription('Shows commands list.')
 		.setDMPermission(false),
-	async execute(interaction){
+	async execute(interaction, logCommandUsage, isDiscordBotReady){
+		try {
 
-		const helpMenuEmbed = new DiscordJS.MessageEmbed()
-			.setColor('#4821bf')
-			.setTitle('COMMANDS LIST')
-			.setURL('https://www.twitch.tv/officialqimiegames')
-			.setDescription(`/help = Shows this menu.
+			const helpMenuEmbed = new DiscordJS.MessageEmbed()
+				.setColor('#4821bf')
+				.setTitle('COMMANDS LIST')
+				.setURL('https://www.twitch.tv/officialqimiegames')
+				.setDescription('/help = Shows this menu.\n\n' + '/rejoin = Make the bot rejoin Atlantic Prisons. [Trusted Command]\n\n' + '/restart = Restart the bot. [Trusted Command]')
+				.setThumbnail('https://i.imgur.com/3ovjQst.png')
+				.setTimestamp()
+				.setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
 
-				/rejoin = Make the bot rejoin Atlantic Prisons. [Trusted Command]
-				
-				/restart = Restart the bot. [Trusted Command]`)
-			.setThumbnail('https://i.imgur.com/3ovjQst.png')
-			.setTimestamp()
-			.setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
-		try{
 			await interaction.editReply({ embeds: [helpMenuEmbed], ephemeral: true });
-			return true;
+			await logCommandUsage(interaction, true);
+			return isDiscordBotReady = true;
 		} catch {
-			return false;
+			try {
+				await logCommandUsage(interaction);
+				return isDiscordBotReady = true;
+			} catch {
+				console.log('[MCHPB] Error occured while running the help command! Restarting the bot...');
+				try{
+					await discordBot.destroy();
+					await ingameBot.end;
+					return isDiscordBotReady = false, process.exit(0);
+				} catch {
+					console.log('[MCHPB] Error occured while restarting the bot properly!');
+					return isDiscordBotReady = false, process.exit(0);
+				}
+			}
 		}
 	},
 };
