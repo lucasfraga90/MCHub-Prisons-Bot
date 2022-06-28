@@ -1,7 +1,7 @@
 .env
-BACKUP.txt
 config.json
 MCHub Prisons Bot.bat
+MCHub Prisons Bot Installer.bat
 node_modules/.package-lock.json
 node_modules/.bin/nearley-railroad
 node_modules/.bin/nearley-railroad.cmd
