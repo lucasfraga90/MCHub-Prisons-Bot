@@ -9,10 +9,6 @@
 #### - Bloodbath Started Alerts.
 #### - Log Ingame Messages To Discord.
 
-## TO-DO:
-#### - Add Witch Boss' Name.
-#### - Re-Write Everything After Finish The Bot(WIP).
-
 ## [INSTALLATION](https://www.youtube.com/playlist?list=PLwsD_Qp4brFf3UgPyncp5ff0CndvL1J0Q "YouTube Playlist"):
 #### 1. Download the installer [here](https://github.com/QimieGames/MCHub-Prisons-Bot/releases "MCHub Prisons Bot Installer Download Page").
 #### 2. Run the installer.
