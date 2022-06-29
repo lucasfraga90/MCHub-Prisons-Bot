@@ -19,4 +19,6 @@
 #### 6. Run MCHub Prisons Bot.bat.
 #### 7. Done, enjoy!
 
+## [REPORT BUGS HERE](https://github.com/QimieGames/MCHub-Prisons-Bot/issues "Report Issue(s)/Bug(s)")
+
 ## [ABOUT ME](https://linktr.ee/qimiegames "Link To All My Stuffs")
