@@ -13,11 +13,11 @@ module.exports = {
 
             const pveBossSpawnedPingRoleID = constantConfigValue.roles_id.pve_boss_ping;
 
-            const pveBossDetail = regexMatches[0];
+            const pveBossDetails = regexMatches[0];
 
-            const pveBossName = pveBossDetail[1];
+            const pveBossName = pveBossDetails[1];
 
-            let pveBossType = pveBossDetail[0];
+            let pveBossType = pveBossDetails[0];
 
             let pveBossSpawnedThumbnailURL;
 

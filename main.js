@@ -74,14 +74,14 @@ const discordBotPartials =
 ];
 
 const regexPatterns = {
-    pve_boss_spawned: new RegExp(/^BEACON \» The \[(ENRAGE||Boss)\] (Estranged Witch||Iron Enforcer||Oxar The Wizard||Explodey Creeper) has spawned\! Go to \/warp beacon to defeat it\! $/, 'm'),
+    pve_boss_spawned: new RegExp(/^BEACON \» The \[([A-Za-z]+)\] ([A-Za-z ]+) has spawned\! Go to \/warp beacon to defeat it\!/, 'm'),
     next_boss: new RegExp(/^BEACON \» The next boss will spawn in ([0-9]+) beacon mob kills\!$/,'m'),
     dungeon_opened: new RegExp(/^Dungeons \» A new dungeon has opened\! You can join the dungeon by typing \/dungeon\!$/, 'm'),
     dungeon_boss_spawned: new RegExp(/^Dungeons \» The dungeon boss has spawned\! There are ([A-Za-z0-9 ]+) left before the dungeon closes\!$/, 'm'),
     next_dungeon: new RegExp(/^Dungeons \» The next dungeon is scheduled to start in (([0-9]+) minutes||([0-9]+) seconds||([0-9]+) minutes ([0-9]+) seconds)\!$/, 'm'),
     beacon_meteor_spawned: new RegExp(/^BEACON \» A meteor has entered the atmosphere and is about to make impact\! Go to \/warp beacon to mine it up\!$/, 'm'),
     bloodbath_started: new RegExp(/^BLOODBATH \» Bloodbath has started\! \/warp pvp$/, 'm'),
-    next_bloodbath: new RegExp(/^BLOODBATH \» The next bloodbath is in (([0-9]+) minutes||([0-9]+) seconds||([0-9]+) minutes ([0-9]+) seconds)\!$/, 'm'),
+    next_bloodbath: new RegExp(/^BLOODBATH \» The next bloodbath is in ([A-Za-z0-9 ]+)\!$/, 'm'),
     global_booster_started: new RegExp(/^MCHUB \» ([A-Za-z0-9_]+) has activated a Global (Mythical||Mega) (E-Token||Proc Rate||Lucky||Quarry) \(([A-Za-z0-9 ]+)\) booster\!$/, 'm')
 };
 
@@ -514,7 +514,7 @@ try {
                 process.exit(0);
             }
         });
-        ingameBot = mineflayer.createBot({ host: 'MCHub.COM', username: process.env.INGAME_BOT_EMAIL, password: process.env.INGAME_BOT_PASSWORD, auth: process.env.INGAME_BOT_AUTH_WAY });
+        ingameBot = mineflayer.createBot({ host: 'MCHub.COM', username: process.env.INGAME_BOT_EMAIL, password: process.env.INGAME_BOT_PASSWORD, auth: process.env.INGAME_BOT_AUTH_WAY, keepAlive: true, checkTimeoutInterval: 60000 });
         consoleChatBox = require('readline').createInterface({ input: process.stdin });
     } else {
         process.exit(1);

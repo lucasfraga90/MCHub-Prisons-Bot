@@ -13,10 +13,14 @@ module.exports = {
 
             const dungeonBossSpawnedPingRoleID = constantConfigValue.roles_id.dungeon_boss_ping;
 
+            const dungeonDetails = regexMatches[0];
+
+            const dungeonTimeLeft = dungeonDetails[0];
+
             const dungeonBossSpawnedEmbed = new DiscordJS.MessageEmbed()
                 .setColor('#eb8334')
                 .setTitle('DUNGEON BOSS SPAWNED')
-                .setDescription(`Time Before Dungeon Ends: ${regexMatches}`)
+                .setDescription(`Dungeon Ends In: ${dungeonTimeLeft}`)
                 .setThumbnail('https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/322/skull-and-crossbones_2620-fe0f.png')
                 .setTimestamp()
                 .setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });

@@ -42,7 +42,24 @@ module.exports = {
                 }
             } else {
                 try{
-                    ingameBot.chat(consoleChatBoxInput);
+
+                    const emptyConsoleChatBoxInputRegex = new RegExp(/^([ ]+)$/, 'm');
+
+                    if(consoleChatBoxInput === ''){
+                        console.log('[MCHPB] Cannot send empty message!');
+                    } else {
+                        switch(emptyConsoleChatBoxInputRegex.test(consoleChatBoxInput)){
+                            default:
+                                console.log('[MCHPB] Error occured! Message was disregard.');
+                                break;
+                            case false:
+                                ingameBot.chat(consoleChatBoxInput);
+                                break;
+                            case true:
+                                console.log('[MCHPB] Cannot send empty message!');
+                                break;
+                        }
+                    }
                 } catch {
                     console.log('[MCHPB] Error occured while sending chat message! Restarting the bot...');
                     try{
