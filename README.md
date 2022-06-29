@@ -2,6 +2,7 @@
 
 
 ## FEATURES:
+#### - Global Booster Alerts.
 #### - PvE Boss Spawned Alerts.
 #### - Dungeon Boss Spawned Alerts.
 #### - Dungeon Opened Alerts.
