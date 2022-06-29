@@ -13,19 +13,37 @@ module.exports = {
 
             const globalBoosterStartedPingRoleID = constantConfigValue.roles_id.global_booster_ping;
 
-            const globalBoosterDetail = regexMatches[0];
+            const globalBoosterDetails = regexMatches[0];
 
-            const globalBoosterOwner = globalBoosterDetail[0];
+            const globalBoosterOwner = globalBoosterDetails[0];
 
-            const globalBoosterRarity = globalBoosterDetail[1];
+            const globalBoosterRarity = globalBoosterDetails[1];
 
-            const globalBoosterType = globalBoosterDetail[2];
+            const globalBoosterType = globalBoosterDetails[2];
 
             const globalBoosterDurationString = globalBoosterDetail[3];
 
             let globalBoosterStartedThumbnailURL;
 
-            function isGBoosterImportant(globalBoosterDurationString, globalBoosterType, globalBoosterStartedThumbnailURL){
+            switch(globalBoosterType){
+                default:
+                    globalBoosterStartedThumbnailURL = 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/322/exclamation-mark_2757.png';
+                    break;
+                case 'E-Token':
+                    globalBoosterStartedThumbnailURL = 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/08/Magma_Cream_JE3_BE2.png/revision/latest?cb=20190501035730';
+                    break;
+                case 'Proc Rate':
+                    globalBoosterStartedThumbnailURL = 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/e7/Diamond_Pickaxe_JE3_BE3.png/revision/latest?cb=20200226193952';
+                    break;
+                case 'Lucky':
+                    globalBoosterStartedThumbnailURL = 'https://static.wikia.nocookie.net/minecraft/images/5/5d/Block_of_Gold.png/revision/latest?cb=20191012230129';
+                    break;
+                case 'Quarry':
+                    globalBoosterStartedThumbnailURL = 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d4/Magenta_Shulker_Box_Revision_1.png/revision/latest?cb=20190407101826';
+                    break;
+            }
+
+            function isGBoosterImportant(globalBoosterDurationString, globalBoosterType){
                 
                 const globalBoosterMinutes = globalBoosterDurationString.match(new RegExp(/^([0-9]+) minutes/, 'm'));
             
@@ -42,21 +60,22 @@ module.exports = {
                 }
                 switch(globalBoosterType){
                     default:
-                        return functionResult, globalBoosterStartedThumbnailURL = 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/322/exclamation-mark_2757.png';
+                        functionResult = false;
+                        return functionResult;
                         break;
                     case 'E-Token':
-                        return functionResult, globalBoosterStartedThumbnailURL = 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/08/Magma_Cream_JE3_BE2.png/revision/latest?cb=20190501035730';
+                        return functionResult;
                         break;
                     case 'Proc Rate':
-                        return functionResult, globalBoosterStartedThumbnailURL = 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/e7/Diamond_Pickaxe_JE3_BE3.png/revision/latest?cb=20200226193952';
+                        return functionResult;
                         break;
                     case 'Lucky':
                         functionResult = false
-                        return functionResult, globalBoosterStartedThumbnailURL = 'https://static.wikia.nocookie.net/minecraft/images/5/5d/Block_of_Gold.png/revision/latest?cb=20191012230129';
+                        return functionResult;
                         break;
                     case 'Quarry':
                         functionResult = false
-                        return functionResult, globalBoosterStartedThumbnailURL = 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d4/Magenta_Shulker_Box_Revision_1.png/revision/latest?cb=20190407101826';
+                        return functionResult;
                         break;
                 }
             }
