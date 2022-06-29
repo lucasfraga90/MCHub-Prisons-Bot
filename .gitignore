@@ -1,7 +1,6 @@
 .env
 config.json
 MCHub Prisons Bot.bat
-MCHub Prisons Bot Installer.bat
 node_modules/.package-lock.json
 node_modules/.bin/nearley-railroad
 node_modules/.bin/nearley-railroad.cmd
@@ -4210,3 +4209,4 @@ node_modules/yggdrasil/src/index.js
 node_modules/yggdrasil/src/Server.js
 node_modules/yggdrasil/src/utils.js
 node_modules/yggdrasil/test/index.js
+*.bat
