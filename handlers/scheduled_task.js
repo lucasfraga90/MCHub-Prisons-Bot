@@ -4,11 +4,11 @@ module.exports = {
     },
     async execute(ingameBot, isDiscordBotReady, isIngameBotReady){
         try {
-            setInterval(async () => ingameBot.chat('/server atlantic11', 180000));
+            setInterval(async () => ingameBot.chat('/server atlantic11'), 180000);
             setInterval(async () => ingameBot.chat('/nextboss'), 299500);
             setInterval(async () => ingameBot.chat('/nextdungeon'), 1800000);
             setInterval(async () => ingameBot.chat('/nextbloodbath'), 3600500);
-            return isDiscordBotReady = true, isIngameBotReady = true;
+            return isIngameBotReady = true;
         } catch {
             console.log('[MCHPB] Error occured while executing scheduled task handler! Restarting the bot...');
 			try {

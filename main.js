@@ -95,7 +95,7 @@ const handlers = new Map();
 
 let isDiscordBotReady = false, isIngameBotReady = false;
 
-let ingameBot, consoleChatBox, errorHandler, constantConfigValue;
+let ingameBot, consoleChatBox, constantConfigValue;
 
 function isImportantDIRsExists(){
     console.log('[MCHPB] Loading important directories...');
@@ -514,7 +514,7 @@ try {
                 process.exit(0);
             }
         });
-        ingameBot = mineflayer.createBot({ host: 'MCHub.COM', username: process.env.INGAME_BOT_EMAIL, password: process.env.INGAME_BOT_PASSWORD, auth: process.env.INGAME_BOT_AUTH_WAY, keepAlive: true, checkTimeoutInterval: 60000 });
+        ingameBot = mineflayer.createBot({ host: 'MCHub.COM', version: '1.8.9', username: process.env.INGAME_BOT_EMAIL, password: process.env.INGAME_BOT_PASSWORD, auth: process.env.INGAME_BOT_AUTH_WAY, keepAlive: true, checkTimeoutInterval: 60000 });
         consoleChatBox = require('readline').createInterface({ input: process.stdin });
     } else {
         process.exit(1);
@@ -733,7 +733,7 @@ ingameBot.once('spawn', async onceSpawnIngameBot => {
         console.log('[MCHPB] Connected to MCHub.COM.');
         if(await registerChatPattern() === true){
             console.log('[MCHPB] Successfully registered chat patterns.');
-            await ingameBot.chat('/server atlantic11');
+            setTimeout(async () => ingameBot.chat('/server atlantic11'), 10000);
         } else {
             console.log('[MCHPB] Error occured while registering chat patterns! Shutting down the bot...');
             discordBot.destroy();
@@ -759,15 +759,15 @@ ingameBot.on('spawn', async onSpawnIngameBot => {
     isIngameBotReady = true;
 });
 
-ingameBot.on('message', async (chatMSGRaw, chatType) => {
+ingameBot.on('chat:scheduled_task', async regexMatches => {
     try {
 
-        const chatHandler = handlers.get('chat');
+        const scheduledTaskHandler = handlers.get('scheduled_task');
 
-        chatHandler.execute(chatMSGRaw, chatType, constantConfigValue, discordBot, isIngameBotReady, isDiscordBotReady);
+        scheduledTaskHandler.execute(ingameBot, isDiscordBotReady, isIngameBotReady);
     } catch {
         try {
-            console.log('[MCHPB] Error occured while executing chat handler! Shutting down the bot...');
+            console.log('[MCHPB] Error occured while executing scheduled task handler! Shutting down the bot...');
             isDiscordBotReady = false;
             isIngameBotReady = false;
             discordBot.destroy();
@@ -780,15 +780,15 @@ ingameBot.on('message', async (chatMSGRaw, chatType) => {
     }
 });
 
-ingameBot.on('chat:scheduled_task', async regexMatches => {
+ingameBot.on('message', async (chatMSGRaw, chatType) => {
     try {
 
-        const scheduledTaskHandler = handlers.get('scheduled_task');
+        const chatHandler = handlers.get('chat');
 
-        scheduledTaskHandler.execute(ingameBot, isDiscordBotReady, isIngameBotReady);
+        chatHandler.execute(chatMSGRaw, chatType, constantConfigValue, discordBot, isIngameBotReady, isDiscordBotReady);
     } catch {
         try {
-            console.log('[MCHPB] Error occured while executing scheduled task handler! Shutting down the bot...');
+            console.log('[MCHPB] Error occured while executing chat handler! Shutting down the bot...');
             isDiscordBotReady = false;
             isIngameBotReady = false;
             discordBot.destroy();
