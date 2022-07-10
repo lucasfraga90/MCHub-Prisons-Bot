@@ -23,7 +23,7 @@
 #### 7. [mineflayer](https://github.com/PrismarineJS/mineflayer "mineflayer")
 
 ## [INSTALLATION](https://www.youtube.com/playlist?list=PLwsD_Qp4brFf3UgPyncp5ff0CndvL1J0Q "YouTube Playlist"):
-#### 1. Download the installer [[HERE]](https://github.com/QimieGames/MCHub-Prisons-Bot/releases "MCHub Prisons Bot Installer Download Page").
+#### 1. Download the installer. [[HERE](https://github.com/QimieGames/MCHub-Prisons-Bot/releases "MCHub Prisons Bot Installer Download Page")]
 #### 2. Run the installer.
 #### 3. Run MCHub Prisons Bot.bat.
 #### 4. Close it.
