@@ -4,14 +4,16 @@ module.exports = {
     data: {
         name: 'beacon_meteor_spawned'
     },
-    async execute(regexMatches, discordBot, constantConfigValue, isDiscordBotReady, isIngameBotReady){
+    async execute(regexMatches, discordBot, configValue){
         try {
-
-            const guildID = constantConfigValue.discord_bot.guild_id;
     
-            const beaconMeteorSpawnedAlertChannelID = constantConfigValue.discord_channels.beacon_meteor;
+            const beaconMeteorSpawnedAlertChannelID = configValue.discord_channels.beacon_meteor;
 
-            const beaconMeteorSpawnedPingRoleID = constantConfigValue.roles_id.beacon_meteor_ping;
+            const guildID = configValue.discord_bot.guild_id;
+
+            const beaconMeteorSpawnedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).name;
+
+            const beaconMeteorSpawnedPingRoleID = configValue.roles_id.beacon_meteor_ping;
 
             const beaconMeteorSpawnedEmbed = new DiscordJS.MessageEmbed()
                 .setColor('#eb8334')
@@ -24,26 +26,21 @@ module.exports = {
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(beaconMeteorSpawnedAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(beaconMeteorSpawnedAlertChannelID).has('SEND_MESSAGES') === true){
                         discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).send({ content: `|| <@&${beaconMeteorSpawnedPingRoleID}> ||`, embeds: [beaconMeteorSpawnedEmbed] });
+                        return true;
                     } else {
-                        console.log('[MCHPB] Error occured while sending beacon meteor spawned alert in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).name + '!');
+                        console.log(`[MCHPB] Error occured while sending beacon meteor spawned alert in #${beaconMeteorSpawnedAlertChannelName}!`);
+                        return false;
                     }
                 } else {
-                    console.log('[MCHPB] Error occured while viewing #' + discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).name + '!');
+                    console.log(`[MCHPB] Error occured while viewing #${beaconMeteorSpawnedAlertChannelName}!`);
+                    return false;
                 }
             } else {
                 console.log('[MCHPB] Error occured while finding beacon meteor spawned alert channel!');
+                return false;
             }
-            return isDiscordBotReady = true, isIngameBotReady = true;
         } catch {
-            console.log('[MCHPB] Error occured while executing beacon meteor spawned alert handler! Restarting the bot...');
-			try {
-				discordBot.destroy();
-				ingameBot.end;
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			} catch {
-				console.log('[MCHPB] Error occured while restarting the bot properly!');
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			}
+            return 'ERROR';
         }
     }
 }

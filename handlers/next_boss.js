@@ -4,14 +4,16 @@ module.exports = {
     data: {
         name: 'next_boss'
     },
-    async execute(regexMatches, discordBot, constantConfigValue, isDiscordBotReady, isIngameBotReady){
+    async execute(regexMatches, discordBot, configValue){
         try {
-
-            const guildID = constantConfigValue.discord_bot.guild_id;
     
-            const nextBossAlertChannelID = constantConfigValue.discord_channels.pve_boss;
+            const nextBossAlertChannelID = configValue.discord_channels.next_pve_boss;
 
-            const nextBossPingRoleID = constantConfigValue.roles_id.pve_boss_ping;
+            const guildID = configValue.discord_bot.guild_id;
+
+            const nextBossAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(nextBossAlertChannelID).name;
+
+            const nextBossPingRoleID = configValue.roles_id.next_pve_boss_ping;
 
             const nextBossDetails = regexMatches[0];
 
@@ -30,29 +32,25 @@ module.exports = {
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(nextBossAlertChannelID).has('SEND_MESSAGES') === true){
                         if(nextBossKillsLeft <= 100){
                             discordBot.guilds.cache.get(guildID).channels.cache.get(nextBossAlertChannelID).send({ content: `|| <@&${nextBossPingRoleID}> ||`, embeds: [nextBossEmbed] });
+                            return true;
                         } else {
                             discordBot.guilds.cache.get(guildID).channels.cache.get(nextBossAlertChannelID).send({ embeds: [nextBossEmbed] });
+                            return true;
                         }
                     } else {
-                        console.log('[MCHPB] Error occured while sending next pve boss alert in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(nextBossAlertChannelID).name + '!');
+                        console.log(`[MCHPB] Error occured while sending next pve boss alert in #${nextBossAlertChannelName}!`);
+                        return false;
                     }
                 } else {
-                    console.log('[MCHPB] Error occured while viewing #' + discordBot.guilds.cache.get(guildID).channels.cache.get(nextBossAlertChannelID).name + '!');
+                    console.log(`[MCHPB] Error occured while viewing #${nextBossAlertChannelName}!`);
+                    return false;
                 }
             } else {
                 console.log('[MCHPB] Error occured while finding next pve boss alert channel!');
+                return false;
             }
-            return isDiscordBotReady = true, isIngameBotReady = true;
         } catch {
-            console.log('[MCHPB] Error occured while executing next boss alert handler! Restarting the bot...');
-			try {
-				discordBot.destroy();
-				ingameBot.end;
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			} catch {
-				console.log('[MCHPB] Error occured while restarting the bot properly!');
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			}
+			return 'ERROR';
         }
     }
 }

@@ -4,14 +4,16 @@ module.exports = {
     data: {
         name: 'dungeon_boss_spawned'
     },
-    async execute(regexMatches, discordBot, constantConfigValue, isDiscordBotReady, isIngameBotReady){
+    async execute(regexMatches, discordBot, configValue){
         try {
-            
-            const guildID = constantConfigValue.discord_bot.guild_id;
     
-            const dungeonBossSpawnedAlertChannelID = constantConfigValue.discord_channels.dungeon_boss;
+            const dungeonBossSpawnedAlertChannelID = configValue.discord_channels.dungeon_boss;
 
-            const dungeonBossSpawnedPingRoleID = constantConfigValue.roles_id.dungeon_boss_ping;
+            const guildID = configValue.discord_bot.guild_id;
+
+            const dungeonBossSpawnedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonBossSpawnedAlertChannelID).name;
+
+            const dungeonBossSpawnedPingRoleID = configValue.roles_id.dungeon_boss_ping;
 
             const dungeonDetails = regexMatches[0];
 
@@ -29,26 +31,21 @@ module.exports = {
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dungeonBossSpawnedAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dungeonBossSpawnedAlertChannelID).has('SEND_MESSAGES') === true){
                         discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonBossSpawnedAlertChannelID).send({ content: `|| <@&${dungeonBossSpawnedPingRoleID}> ||`, embeds: [dungeonBossSpawnedEmbed] });
+                        return true;
                     } else {
-                        console.log('[MCHPB] Error occured while sending dungeon boss spawned alert in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonBossSpawnedAlertChannelID).name + '!');
+                        console.log(`[MCHPB] Error occured while sending dungeon boss spawned alert in #${dungeonBossSpawnedAlertChannelName}!`);
+                        return false;
                     }
                 } else {
-                    console.log('[MCHPB] Error occured while viewing #' + discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonBossSpawnedAlertChannelID).name + '!');
+                    console.log(`[MCHPB] Error occured while viewing #${dungeonBossSpawnedAlertChannelName}!`);
+                    return false;
                 }
             } else {
                 console.log('[MCHPB] Error occured while finding dungeon boss spawned alert channel!');
+                return false;
             }
-            return isDiscordBotReady = true, isIngameBotReady = true;
         } catch {
-            console.log('[MCHPB] Error occured while executing dungeon boss spawned alert handler! Restarting the bot...');
-			try {
-				discordBot.destroy();
-				ingameBot.end;
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			} catch {
-				console.log('[MCHPB] Error occured while restarting the bot properly!');
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			}
+            return 'ERROR';
         }
     }
 }

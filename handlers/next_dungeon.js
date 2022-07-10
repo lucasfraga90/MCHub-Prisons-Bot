@@ -4,12 +4,14 @@ module.exports = {
     data: {
         name: 'next_dungeon'
     },
-    async execute(regexMatches, discordBot, constantConfigValue, isDiscordBotReady, isIngameBotReady){
+    async execute(regexMatches, discordBot, configValue){
         try {
-
-            const guildID = constantConfigValue.discord_bot.guild_id;
     
-            const nextDungeonAlertChannelID = constantConfigValue.discord_channels.dungeon;
+            const nextDungeonAlertChannelID = configValue.discord_channels.next_dungeon;
+
+            const guildID = configValue.discord_bot.guild_id;
+
+            const nextDungeonAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(nextDungeonAlertChannelID).name;
 
             const nextDungeonDetails = regexMatches[0];
 
@@ -27,26 +29,21 @@ module.exports = {
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(nextDungeonAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(nextDungeonAlertChannelID).has('SEND_MESSAGES') === true){
                         discordBot.guilds.cache.get(guildID).channels.cache.get(nextDungeonAlertChannelID).send({ embeds: [nextDungeonEmbed] });
+                        return true;
                     } else {
-                        console.log('[MCHPB] Error occured while sending next dungeon event alert in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(nextDungeonAlertChannelID).name + '!');
+                        console.log(`[MCHPB] Error occured while sending next dungeon event alert in #${nextDungeonAlertChannelName}!`);
+                        return false;
                     }
                 } else {
-                    console.log('[MCHPB] Error occured while viewing #' + discordBot.guilds.cache.get(guildID).channels.cache.get(nextDungeonAlertChannelID).name + '!');
+                    console.log(`[MCHPB] Error occured while viewing #${nextDungeonAlertChannelName}!`);
+                    return false;
                 }
             } else {
                 console.log('[MCHPB] Error occured while finding next dungeon event alert channel!');
+                return false;
             }
-            return isDiscordBotReady = true, isIngameBotReady = true;
-        } catch {
-            console.log('[MCHPB] Error occured while executing next dungeon alert handler! Restarting the bot...');
-			try {
-				discordBot.destroy();
-				ingameBot.end;
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			} catch {
-				console.log('[MCHPB] Error occured while restarting the bot properly!');
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			}
+        } catch{
+            return 'ERROR';
         }
     }
 }

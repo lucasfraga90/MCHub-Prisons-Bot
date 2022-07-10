@@ -4,12 +4,14 @@ module.exports = {
     data: {
         name: 'next_bloodbath'
     },
-    async execute(regexMatches, discordBot, constantConfigValue, isDiscordBotReady, isIngameBotReady){    
+    async execute(regexMatches, discordBot, configValue){    
         try {
-
-            const guildID = constantConfigValue.discord_bot.guild_id;
     
-            const nextBloodbathAlertChannelID = constantConfigValue.discord_channels.bloodbath;
+            const nextBloodbathAlertChannelID = configValue.discord_channels.next_bloodbath;
+
+            const guildID = configValue.discord_bot.guild_id;
+
+            const nextBloodbathAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(nextBloodbathAlertChannelID).name;
 
             const nextBloodbathDetails = regexMatches[0];
 
@@ -27,26 +29,21 @@ module.exports = {
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(nextBloodbathAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(nextBloodbathAlertChannelID).has('SEND_MESSAGES') === true){
                         discordBot.guilds.cache.get(guildID).channels.cache.get(nextBloodbathAlertChannelID).send({ embeds: [nextBloodbathEmbed] });
+                        return true;
                     } else {
-                        console.log('[MCHPB] Error occured while sending next bloodbath event alert in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(nextBloodbathAlertChannelID).name + '!');
+                        console.log(`[MCHPB] Error occured while sending next bloodbath event alert in #${nextBloodbathAlertChannelName}!`);
+                        return false;
                     }
                 } else {
-                    console.log('[MCHPB] Error occured while viewing #' + discordBot.guilds.cache.get(guildID).channels.cache.get(nextBloodbathAlertChannelID).name + '!');
+                    console.log(`[MCHPB] Error occured while viewing #${nextBloodbathAlertChannelName}`);
+                    return false;
                 }
             } else {
                 console.log('[MCHPB] Error occured while finding next bloodbath event alert channel!');
+                return false;
             }
-            return isDiscordBotReady = true, isIngameBotReady = true;
         } catch {
-            console.log('[MCHPB] Error occured while executing next bloodbath alert handler! Restarting the bot...');
-			try {
-				discordBot.destroy();
-				ingameBot.end;
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			} catch {
-				console.log('[MCHPB] Error occured while restarting the bot properly!');
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			}
+			return 'ERROR';
         }
     }
 }

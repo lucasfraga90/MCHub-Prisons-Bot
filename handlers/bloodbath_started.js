@@ -4,14 +4,16 @@ module.exports = {
     data: {
         name: 'bloodbath_started'
     },
-    async execute(regexMatches, discordBot, constantConfigValue, isDiscordBotReady, isIngameBotReady){    
+    async execute(regexMatches, discordBot, configValue){    
         try {
-
-            const guildID = constantConfigValue.discord_bot.guild_id;
     
-            const bloodbathStartedAlertChannelID = constantConfigValue.discord_channels.bloodbath;
+            const bloodbathStartedAlertChannelID = configValue.discord_channels.bloodbath;
 
-            const bloodbathStartedPingRoleID = constantConfigValue.roles_id.bloodbath_ping;
+            const guildID = configValue.discord_bot.guild_id;
+
+            const bloodbathStartedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(bloodbathStartedAlertChannelID).name;
+
+            const bloodbathStartedPingRoleID = configValue.roles_id.bloodbath_ping;
 
             const bloodbathStartedEmbed = new DiscordJS.MessageEmbed()
                 .setColor('#eb8334')
@@ -24,26 +26,21 @@ module.exports = {
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(bloodbathStartedAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(bloodbathStartedAlertChannelID).has('SEND_MESSAGES') === true){
                         discordBot.guilds.cache.get(guildID).channels.cache.get(bloodbathStartedAlertChannelID).send({ content: `|| <@&${bloodbathStartedPingRoleID}> ||`, embeds: [bloodbathStartedEmbed] });
+                        return true;
                     } else {
-                        console.log('[MCHPB] Error occured while sending bloodbath started alert in #' + discordBot.guilds.cache.get(guildID).channels.cache.get(bloodbathStartedAlertChannelID).name + '!');
+                        console.log(`[MCHPB] Error occured while sending bloodbath started alert in #${bloodbathStartedAlertChannelName}!'`);
+                        return false;
                     }
                 } else {
-                    console.log('[MCHPB] Error occured while viewing #' + discordBot.guilds.cache.get(guildID).channels.cache.get(bloodbathStartedAlertChannelID).name + '!');
+                    console.log(`[MCHPB] Error occured while viewing #${bloodbathStartedAlertChannelName}!`);
+                    return false;
                 }
             } else {
                 console.log('[MCHPB] Error occured while finding bloodbath started alert channel!');
+                return false;
             }
-            return isDiscordBotReady = true, isIngameBotReady = true;
         } catch {
-            console.log('[MCHPB] Error occured while executing bloodbath started alert handler! Restarting the bot...');
-			try {
-				discordBot.destroy();
-				ingameBot.end;
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			} catch {
-				console.log('[MCHPB] Error occured while restarting the bot properly!');
-				return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);
-			}
+            return 'ERROR';
         }
     }
 }
