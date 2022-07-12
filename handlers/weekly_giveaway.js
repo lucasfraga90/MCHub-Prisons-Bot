@@ -4,12 +4,10 @@ module.exports = {
     data: {
         name: 'weekly_giveaway'
     },
-    async execute(regexMatches, discordBot, configValue){
+    async execute(regexMatches, discordBot, configValue, guildID){
         try {
 
             const weeklyGiveawayAlertChannelID = configValue.discord_channels.weekly_giveaway;
-
-            const guildID = configValue.discord_bot.guild_id;
 
             const weeklyGiveawayAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(weeklyGiveawayAlertChannelID).name;
 

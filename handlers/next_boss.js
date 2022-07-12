@@ -4,12 +4,10 @@ module.exports = {
     data: {
         name: 'next_boss'
     },
-    async execute(regexMatches, discordBot, configValue){
+    async execute(regexMatches, discordBot, configValue, guildID){
         try {
     
             const nextBossAlertChannelID = configValue.discord_channels.next_pve_boss;
-
-            const guildID = configValue.discord_bot.guild_id;
 
             const nextBossAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(nextBossAlertChannelID).name;
 

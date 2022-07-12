@@ -4,18 +4,18 @@ module.exports = {
     data: {
         name: 'pve_boss_spawned'
     },
-    async execute(regexMatches, discordBot, configValue){
+    async execute(regexMatches, discordBot, configValue, guildID){
         try {
 
             const pveBossSpawnedAlertChannelID = configValue.discord_channels.pve_boss;
-
-            const guildID = configValue.discord_bot.guild_id;
 
             const pveBossSpawnedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).name;
 
             const pveBossSpawnedPingRoleID = configValue.roles_id.pve_boss_ping;
 
             const pveBossDetails = regexMatches[0];
+
+            const pveBossName = pveBossDetails[1];
 
             let pveBossType = pveBossDetails[0], pveBossSpawnedThumbnailURL;
 
@@ -30,8 +30,6 @@ module.exports = {
                     pveBossType = 'ENRAGED';
                     break;
             }
-
-            const pveBossName = pveBossDetails[1];
 
             switch(pveBossName){
                 default:

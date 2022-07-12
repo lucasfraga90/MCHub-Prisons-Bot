@@ -4,55 +4,55 @@ module.exports = {
     data: {
         name: 'global_booster_started'
     },
-    async execute(regexMatches, discordBot, configValue, isDiscordBotReady, isIngameBotReady){
+    async execute(regexMatches, discordBot, configValue, guildID){
         try {
     
             const globalBoosterStartedAlertChannelID = configValue.discord_channels.global_booster;
-
-            const guildID = configValue.discord_bot.guild_id;
 
             const globalBoosterStartedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(globalBoosterStartedAlertChannelID).name;
 
             const globalBoosterStartedPingRoleID = configValue.roles_id.global_booster_ping;
 
-            function isGBoosterImportant(globalBoosterDurationString, globalBoosterType){
+            function isGBoosterImportant(globalBoosterDuration, globalBoosterType){
                 
-                const globalBoosterMinutes = globalBoosterDurationString.match(new RegExp(/^([0-9]+) minutes/, 'm'));
-            
-                let functionResult;
-            
+                const globalBoosterMinutes = globalBoosterDuration.match(new RegExp(/^([0-9]+) minutes/, 'm'));
+
                 if(globalBoosterMinutes != null){
                     if(globalBoosterMinutes[1] >= 10){
-                        functionResult = true;
+                        switch(globalBoosterType){
+                            default:
+                                return false;
+                                break;
+                            case 'Proc Rate':
+                                return true;
+                                break;
+                            case 'E-Token':
+                                return true;
+                                break;
+                            case 'Lucky':
+                                return false;
+                                break;
+                            case 'Quarry':
+                                return false;
+                                break;
+                        }
                     } else {
-                        functionResult = false;
+                        return false;
                     }
                 } else {
-                    functionResult = false;
+                    return false;
                 }
-                switch(globalBoosterType){
-                    default:
-                        functionResult = false;
-                        break;
-                    case 'Lucky':
-                        functionResult = false;
-                        break;
-                    case 'Quarry':
-                        functionResult = false;
-                        break;
-                }
-                return functionResult;
             }
 
             const globalBoosterDetails = regexMatches[0];
 
             const globalBoosterOwner = globalBoosterDetails[0];
 
-            const globalBoosterRarity = globalBoosterDetails[1];
-
             const globalBoosterType = globalBoosterDetails[2];
 
-            const globalBoosterDurationString = globalBoosterDetails[3];
+            const globalBoosterRarity = globalBoosterDetails[1];
+
+            const globalBoosterDuration = String(globalBoosterDetails[3]);
 
             let globalBoosterStartedThumbnailURL;
 
@@ -87,7 +87,7 @@ module.exports = {
             const globalBoosterStartedEmbed = new DiscordJS.MessageEmbed()
                 .setColor('#eb8334')
                 .setTitle('GLOBAL BOOSTER')
-                .setDescription(`Owner: ${globalBoosterOwner}\n` + `Type: ${globalBoosterType}\n` + `Rarity: ${globalBoosterRarity}\n` + `Duration: ${globalBoosterDurationString}`)
+                .setDescription(`Owner: ${globalBoosterOwner}\n` + `Type: ${globalBoosterType}\n` + `Rarity: ${globalBoosterRarity}\n` + `Duration: ${globalBoosterDuration}`)
                 .setThumbnail(`${globalBoosterStartedThumbnailURL}`)
                 .setTimestamp()
                 .setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
@@ -95,7 +95,7 @@ module.exports = {
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(globalBoosterStartedAlertChannelID) != undefined){
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(globalBoosterStartedAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(globalBoosterStartedAlertChannelID).has('SEND_MESSAGES') === true){
-                        if(isGBoosterImportant(globalBoosterDurationString, globalBoosterType) === true){
+                        if(isGBoosterImportant(globalBoosterDuration, globalBoosterType) === true){
                             discordBot.guilds.cache.get(guildID).channels.cache.get(globalBoosterStartedAlertChannelID).send({ content: `|| <@&${globalBoosterStartedPingRoleID}> ||`, embeds: [globalBoosterStartedEmbed] });
                             return true;
                         } else {

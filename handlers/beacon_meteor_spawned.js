@@ -4,12 +4,10 @@ module.exports = {
     data: {
         name: 'beacon_meteor_spawned'
     },
-    async execute(regexMatches, discordBot, configValue){
+    async execute(regexMatches, discordBot, configValue, guildID){
         try {
     
             const beaconMeteorSpawnedAlertChannelID = configValue.discord_channels.beacon_meteor;
-
-            const guildID = configValue.discord_bot.guild_id;
 
             const beaconMeteorSpawnedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).name;
 

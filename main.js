@@ -14,12 +14,13 @@ const commandsDIR ='./commands/';
 
 const handlersDIR ='./handlers/';
 
+const errorLogsDIR = './error_logs/';
+
 const defaultEnvFileLayout =
 
 `DISCORD_BOT_TOKEN=DISCORD_BOT_TOKEN_HERE
 INGAME_BOT_EMAIL=INGAME_BOT_EMAIL_HERE
-INGAME_BOT_PASSWORD=INGAME_BOT_PASSWORD_HERE
-INGAME_BOT_AUTH_WAY=mojang`;
+INGAME_BOT_PASSWORD=INGAME_BOT_PASSWORD_HERE`;
 
 const defaultConfigFileLayout = 
 
@@ -91,9 +92,7 @@ const discordBotPartials =
     'CHANNEL',
     'GUILD_MEMBER',
     'MESSAGE',
-    'USER',
-    'REACTION',
-    'GUILD_SCHEDULED_EVENT'
+    'USER'
 ];
 
 const regexPatterns = {
@@ -130,6 +129,11 @@ function isImportantDIRsExists(){
     }
     try {
         nodeFS.accessSync(handlersDIR, nodeFS.constants.F_OK);
+    } catch {
+        return false;
+    }
+    try {
+        nodeFS.accessSync(errorLogsDIR, nodeFS.constants.F_OK);
         return true;
     } catch {
         return false;
@@ -173,6 +177,7 @@ function isImportantFilesExists(){
                 return false;
             }
         });
+        nodeFS.accessSync('LICENSE', nodeFS.constants.F_OK);
         return true;
     } catch {
         return false;
@@ -200,17 +205,13 @@ function generateEnvFile(){
 }
 
 function isEnvFileValid(){
-    if(process.env.DISCORD_BOT_TOKEN === undefined || process.env.INGAME_BOT_EMAIL === undefined || process.env.INGAME_BOT_PASSWORD === undefined || process.env.INGAME_BOT_AUTH_WAY === undefined){
+    if(process.env.DISCORD_BOT_TOKEN === undefined || process.env.INGAME_BOT_EMAIL === undefined || process.env.INGAME_BOT_PASSWORD === undefined){
         return false;
     } else {
         if(process.env.DISCORD_BOT_TOKEN === 'DISCORD_BOT_TOKEN_HERE' || process.env.INGAME_BOT_EMAIL === 'INGAME_BOT_EMAIL_HERE' || process.env.INGAME_BOT_PASSWORD === 'INGAME_BOT_PASSWORD_HERE'){
             return false;
         } else {
-            if(process.env.INGAME_BOT_AUTH_WAY === 'mojang' || process.env.INGAME_BOT_AUTH_WAY === 'microsoft'){
-                return true;
-            } else {
-                return false;
-            }
+            return true;
         }
     }
 }
@@ -451,6 +452,7 @@ async function registerChatPattern(){
     console.log('[MCHPB] Registering chat patterns...');
     try {
         Object.keys(regexPatterns).forEach(regexPatternName => {
+            if(configValue.features[regexPatternName] === 'false') return;
             ingameBot.addChatPattern(regexPatternName, regexPatterns[regexPatternName], { repeat: true, parse: true });
             ingameBot.addChatPatternSet;
         });
@@ -481,7 +483,7 @@ async function logCommandUsage(discordInteraction, commandResult){
         const commandLogEmbed = new DiscordJS.MessageEmbed()
 			.setColor('#b2ebe3')
 			.setTitle('COMMAND LOG')
-			.setDescription(`Command Result: ${commandResultString}\n` + `Command: ${discordInteraction.commandName.toUpperCase()}\n` + `Channel's Name: #${discordInteraction.channel.name}\n` + `Channel's ID: ${discordInteraction.channel.id}\n` + `User's Discord Username: ${discordInteraction.member.displayName}\n` + `User's Discord ID: ${discordInteraction.member.id}`)
+			.setDescription(`Command Result: ${commandResult}\n` + `Command: ${discordInteraction.commandName.toUpperCase()}\n` + `Channel's Name: #${discordInteraction.channel.name}\n` + `Channel's ID: ${discordInteraction.channel.id}\n` + `User's Discord Username: ${discordInteraction.member.displayName}\n` + `User's Discord ID: ${discordInteraction.member.id}`)
 			.setThumbnail(discordInteraction.member.displayAvatarURL())
 			.setTimestamp()
 			.setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
@@ -538,7 +540,7 @@ try {
             }
         });
 
-        ingameBot = mineflayer.createBot({ host: 'MCHub.COM', version: '1.16.5', username: process.env.INGAME_BOT_EMAIL, password: process.env.INGAME_BOT_PASSWORD, auth: process.env.INGAME_BOT_AUTH_WAY, keepAlive: true, checkTimeoutInterval: 60000 });
+        ingameBot = mineflayer.createBot({ host: 'MCHub.COM', version: '1.18', username: process.env.INGAME_BOT_EMAIL, password: process.env.INGAME_BOT_PASSWORD, auth: 'microsoft', keepAlive: true, checkTimeoutInterval: 60000, physicsEnabled: 'false' });
 
     } else {
         console.log('[MCHPB] Error occured while loading important directories & files! Force restarting the bot...');
@@ -672,7 +674,9 @@ discordBot.on('interactionCreate', async discordInteraction => {
                 case 'restart':
                     commandResult = await discordSlashCommand.execute(discordInteraction, configValue, ingameBot);
                     logCommandUsage(discordInteraction, commandResult).then(() => {
-                        process.exit(0);
+                        setTimeout(() => {
+                            process.exit(0);
+                        }, 3000);
                     });
                     break;
             }
@@ -764,7 +768,7 @@ async function logChatAlert(alertName, alertStatus){
                 break;
         }
 
-        alertName = String(alertName).replace('_', ' ').toUpperCase();
+        alertName = String(alertName).replace(new RegExp(/([_]+)/, 'g'), ' ').toUpperCase();
 
         const chatAlertLogsChannelID = configValue.discord_channels.chat_alert_logs;
 
@@ -809,7 +813,7 @@ Object.keys(regexPatterns).forEach(async regexPatternName => {
 
             const alertHandler = handlers.get(regexPatternName);
 
-            const alertStatus = await alertHandler.execute(regexMatches, discordBot, configValue);
+            const alertStatus = await alertHandler.execute(regexMatches, discordBot, configValue, guildID);
 
             logChatAlert(regexPatternName, alertStatus);
         } catch {

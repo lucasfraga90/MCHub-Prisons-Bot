@@ -4,12 +4,10 @@ module.exports = {
     data: {
         name: 'next_dungeon'
     },
-    async execute(regexMatches, discordBot, configValue){
+    async execute(regexMatches, discordBot, configValue, guildID){
         try {
     
             const nextDungeonAlertChannelID = configValue.discord_channels.next_dungeon;
-
-            const guildID = configValue.discord_bot.guild_id;
 
             const nextDungeonAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(nextDungeonAlertChannelID).name;
 

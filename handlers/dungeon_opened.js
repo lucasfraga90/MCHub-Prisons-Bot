@@ -4,12 +4,10 @@ module.exports = {
     data: {
         name: 'dungeon_opened'
     },
-    async execute(regexMatches, discordBot, configValue){
+    async execute(regexMatches, discordBot, configValue, guildID){
         try {
     
             const dungeonOpenedAlertChannelID = configValue.discord_channels.dungeon;
-
-            const guildID = configValue.discord_bot.guild_id;
 
             const dungeonOpenedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID).name;
 

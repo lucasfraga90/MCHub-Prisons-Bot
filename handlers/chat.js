@@ -4,16 +4,17 @@ module.exports = {
     },
     async execute(chatMSGRaw, configValue, discordBot, isIngameBotReady, isDiscordBotReady){
         async function logIngameChatToConsole(){
-            console.log(chatMSGRaw.toAnsi());
+            if(configValue.features.log_ingame_chat_to_console === 'true') return console.log(chatMSGRaw.toAnsi());
         }
         async function logIngameChatToDiscord(){
+
+            if(configValue.features.log_ingame_chat_to_discord === 'false') return;
             
             const guildID = configValue.discord_bot.guild_id;
         
             const ingameChatChannelID = configValue.discord_channels.ingame_chat;
 
             const ingameChatChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID).name;
-            
             
             if(chatMSGRaw.toString().length >= 5){
                 if(discordBot.guilds.cache.get(guildID).channels.cache.get(ingameChatChannelID) != undefined){
@@ -31,19 +32,9 @@ module.exports = {
                 }
             }
         }
-        if(configValue.features.log_ingame_chat_to_console === 'true'){
-            if(configValue.features.log_ingame_chat_to_discord === 'true'){
-                logIngameChatToConsole().then(() => {
-                    logIngameChatToDiscord();
-                });
-            } else {
-                logIngameChatToConsole();
-            }
-        } else {
-            if(configValue.features.log_ingame_chat_to_discord === 'true'){
-                logIngameChatToDiscord();
-            }
-        }
-        return isDiscordBotReady = true, isIngameBotReady = true;
+        logIngameChatToConsole().then(() => {
+            logIngameChatToDiscord();
+            return isDiscordBotReady = true, isIngameBotReady = true;
+        });
     }
 }
