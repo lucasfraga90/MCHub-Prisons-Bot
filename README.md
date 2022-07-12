@@ -1,5 +1,6 @@
 # MCHub-Prisons-Discord-Bot
 
+[![Community Discord](https://img.shields.io/static/v1.svg?label=COMMUNITY&message=DISCORD&color=blue&logo=discord&style=for-the-badge)](https://discord.gg/RtZyHNeM8b)
 
 ## FEATURES:
 #### - Daily, Weekly & Monthly Giveaway Winners Alert.
@@ -25,10 +26,10 @@
 ## [INSTALLATION](https://www.youtube.com/playlist?list=PLwsD_Qp4brFf3UgPyncp5ff0CndvL1J0Q "YouTube Playlist"):
 #### 1. Download the installer. [[HERE](https://github.com/QimieGames/MCHub-Prisons-Bot/releases "MCHub Prisons Bot Installer Download Page")]
 #### 2. Run the installer.
-#### 3. Run MCHub Prisons Bot.bat.
+#### 3. Run "MCHub Prisons Bot.exe".
 #### 4. Close it.
-#### 5. Configure config.json & .env file correctly.
-#### 6. Run MCHub Prisons Bot.exe.
+#### 5. Configure .env & config file correctly.
+#### 6. Run "MCHub Prisons Bot.exe".
 #### 7. Done, enjoy!
 
 ## [REPORT BUGS HERE](https://github.com/QimieGames/MCHub-Prisons-Bot/issues "Report Issue(s)/Bug(s)")

@@ -13,7 +13,7 @@ module.exports = {
         const errorLogFileName = `ERROR_LOG-${errorOccuredDate.getDate()}_${errorOccuredDate.getMonth() + 1}_${errorOccuredDate.getFullYear()}-${errorOccuredDate.getHours()}_${errorOccuredDate.getMinutes()}_${errorOccuredDate.getSeconds()}`;
 
         nodeFS.appendFileSync(`${String(errorLogsDIR)}${String(errorLogFileName)}.json`, String(errorInfo), 'utf-8');
-        console.log(`Error occured! Restarting the bot...`);
+        console.log(`[MCHPB] Error occured! Restarting the bot...`);
         discordBot.destroy();
         ingameBot.end;
         return isDiscordBotReady = false, isIngameBotReady = false, process.exit(0);

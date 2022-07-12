@@ -2,15 +2,13 @@ module.exports = {
     data: {
         name: 'chat'
     },
-    async execute(chatMSGRaw, configValue, discordBot, isIngameBotReady, isDiscordBotReady){
+    async execute(chatMSGRaw, configValue, discordBot, guildID, isIngameBotReady, isDiscordBotReady){
         async function logIngameChatToConsole(){
             if(configValue.features.log_ingame_chat_to_console === 'true') return console.log(chatMSGRaw.toAnsi());
         }
         async function logIngameChatToDiscord(){
 
             if(configValue.features.log_ingame_chat_to_discord === 'false') return;
-            
-            const guildID = configValue.discord_bot.guild_id;
         
             const ingameChatChannelID = configValue.discord_channels.ingame_chat;
 

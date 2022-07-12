@@ -33,17 +33,17 @@ const defaultConfigFileLayout =
       ingame_chat: "1",
       monthly_giveaway: "1",
       weekly_giveaway: "1",
-      daily_giveaway: "",
+      daily_giveaway: "1",
       global_booster: "1",
-      pve_boss: "1",
-      next_pve_boss: "1",
-      dungeon_boss: "1",
-      dungeon: "1",
-      next_dungeon: "",
-      beacon_meteor: "1",
-      bloodbath: "1",
-      next_bloodbath: "",
-      command_logs: "1",
+      pve_boss_spawned: "1",
+      upcoming_pve_boss: "1",
+      dungeon_boss_spawned: "1",
+      dungeon_opened: "1",
+      upcoming_dungeon: "1",
+      beacon_meteor_spawned: "1",
+      bloodbath_started: "1",
+      upcoming_bloodbath: "1",
+      discord_command_logs: "1",
       chat_alert_logs: "1"
   },
   features: {
@@ -52,16 +52,16 @@ const defaultConfigFileLayout =
       monthly_giveaway: "true",
       weekly_giveaway: "true",
       daily_giveaway: "true",
-      global_booster_started: "true",
+      global_booster: "true",
       pve_boss_spawned: "true",
-      next_boss: "true",
+      upcoming_pve_boss: "true",
       dungeon_boss_spawned: "true",
       dungeon_opened: "true",
-      next_dungeon: "true",
+      upcoming_dungeon: "true",
       beacon_meteor_spawned: "true",
       bloodbath_started: "true",
-      next_bloodbath: "true",
-      command_logs: "true",
+      upcoming_bloodbath: "true",
+      discord_command_logs: "true",
       chat_alert_logs: "true"
   },
   roles_id: {
@@ -69,12 +69,12 @@ const defaultConfigFileLayout =
       bot_trusted: "1",
       bot_blacklisted: "1",
       global_booster_ping: "1",
-      pve_boss_ping: "1",
-      next_pve_boss_ping: "1",
-      dungeon_boss_ping: "1",
-      dungeon_ping: "1",
-      beacon_meteor_ping: "1",
-      bloodbath_ping: "1"
+      pve_boss_spawned_ping: "1",
+      upcoming_pve_boss_ping: "1",
+      dungeon_boss_spawned_ping: "1",
+      dungeon_opened_ping: "1",
+      beacon_meteor_spawned_ping: "1",
+      bloodbath_started_ping: "1"
   }
 };
 
@@ -96,18 +96,18 @@ const discordBotPartials =
 ];
 
 const regexPatterns = {
+    monthly_giveaway: new RegExp(/^Monthly giveaway winners for ([0-9-]+) are ([0-9A-Za-z_*]+)\, ([0-9A-Za-z_*]+)/, 'm'),
+    weekly_giveaway: new RegExp(/^Weekly giveaway winners for ([0-9-]+) are ([0-9A-Za-z_*]+)\, ([0-9A-Za-z_*]+)/, 'm'),
+    daily_giveaway: new RegExp(/^Daily giveaway winners for ([0-9-]+) are ([0-9A-Za-z_*]+)\, ([0-9A-Za-z_*]+)\, ([0-9A-Za-z_*]+)/, 'm'),
+    global_booster: new RegExp(/^MCHUB \» ([0-9A-Za-z_*]+) has activated a Global ([A-Za-z]+) ([A-Za-z- ]+) \(([a-z0-9 ]+)\) booster\!/, 'm'),
     pve_boss_spawned: new RegExp(/^BEACON \» The \[([A-Za-z]+)\] ([A-Za-z ]+) has spawned\! Go to \/warp beacon to defeat it\!/, 'm'),
-    next_boss: new RegExp(/^BEACON \» The next boss will spawn in ([0-9]+) beacon mob kills\!/,'m'),
-    dungeon_opened: new RegExp(/^Dungeons \» A new dungeon has opened\! You can join the dungeon by typing \/dungeon\!/, 'm'),
+    upcoming_pve_boss: new RegExp(/^BEACON \» The next boss will spawn in ([0-9]+) beacon mob kills\!/,'m'),
     dungeon_boss_spawned: new RegExp(/^Dungeons \» The dungeon boss has spawned\! There are ([0-9a-z ]+) left before the dungeon closes\!/, 'm'),
-    next_dungeon: new RegExp(/^Dungeons \» The next dungeon is scheduled to start in ([0-9a-z ]+)\!/, 'm'),
+    dungeon_opened: new RegExp(/^Dungeons \» A new dungeon has opened\! You can join the dungeon by typing \/dungeon\!/, 'm'),
+    upcoming_dungeon: new RegExp(/^Dungeons \» The next dungeon is scheduled to start in ([0-9a-z ]+)\!/, 'm'),
     beacon_meteor_spawned: new RegExp(/^BEACON \» A meteor has entered the atmosphere and is about to make impact\! Go to \/warp beacon to mine it up\!/, 'm'),
     bloodbath_started: new RegExp(/^BLOODBATH \» Bloodbath has started\! \/warp pvp/, 'm'),
-    next_bloodbath: new RegExp(/^BLOODBATH \» The next bloodbath is in ([0-9a-z ]+)\!/, 'm'),
-    global_booster_started: new RegExp(/^MCHUB \» ([0-9A-Za-z_*]+) has activated a Global ([A-Za-z]+) ([A-Za-z- ]+) \(([a-z0-9 ]+)\) booster\!/, 'm'),
-    daily_giveaway: new RegExp(/^Daily giveaway winners for ([0-9-]+) are ([0-9A-Za-z_*]+)\, ([0-9A-Za-z_*]+)\, ([0-9A-Za-z_*]+)/, 'm'),
-    weekly_giveaway: new RegExp(/^Weekly giveaway winners for ([0-9-]+) are ([0-9A-Za-z_*]+)\, ([0-9A-Za-z_*]+)/, 'm'),
-    monthly_giveaway: new RegExp(/^Monthly giveaway winners for ([0-9-]+) are ([0-9A-Za-z_*]+)\, ([0-9A-Za-z_*]+)/, 'm')
+    upcoming_bloodbath: new RegExp(/^BLOODBATH \» The next bloodbath is in ([0-9a-z ]+)\!/, 'm')
 };
 
 const discordBot = new DiscordJS.Client({ intents: discordBotIntents, partials: discordBotPartials });
@@ -143,7 +143,7 @@ function isImportantDIRsExists(){
 function isImportantFilesExists(){
     console.log('[MCHPB] Loading important files...');
     try {
-        const defaultHandlerFilesArray = ['beacon_meteor_spawned.js', 'bloodbath_started.js', 'chat.js', 'console_chat_box.js', 'daily_giveaway.js', 'dungeon_boss_spawned.js', 'dungeon_opened.js', 'error.js', 'global_booster_started.js', 'monthly_giveaway.js', 'next_bloodbath.js', 'next_boss.js', 'next_dungeon.js', 'pve_boss_spawned.js', 'schedule_task.js', 'weekly_giveaway.js'];
+        const defaultHandlerFilesArray = ['beacon_meteor_spawned.js', 'bloodbath_started.js', 'chat.js', 'console_chat_box.js', 'daily_giveaway.js', 'dungeon_boss_spawned.js', 'dungeon_opened.js', 'error.js', 'global_booster.js', 'monthly_giveaway.js', 'pve_boss_spawned.js', 'schedule_task.js', 'upcoming_bloodbath.js', 'upcoming_dungeon.js', 'upcoming_pve_boss.js', 'weekly_giveaway.js'];
     
         const defaultCommandFilesArray = ['help.js', 'rejoin.js', 'restart.js'];
     
@@ -429,7 +429,7 @@ function registerSlashCommands(){
     console.log('[MCHPB] Synchronizing slash commands...');
     try {
 
-        const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
+        const restAPI = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
         const discordCommandFiles = nodeFS.readdirSync(commandsDIR).filter(file => file.endsWith('.js'));
 
@@ -441,7 +441,7 @@ function registerSlashCommands(){
             discordCommands.push(command.data.toJSON());
             discordBot.commands.set(command.data.name, command);
         }
-        rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: discordCommands });
+        restAPI.put(Routes.applicationGuildCommands(clientID, guildID), { body: discordCommands });
         return true;
     } catch {
         return false;
@@ -464,9 +464,9 @@ async function registerChatPattern(){
 
 async function logCommandUsage(discordInteraction, commandResult){
     try {
-        if(configValue.features.command_logs === 'false') return;
+        if(configValue.features.discord_command_logs === 'false') return;
 
-        const commandLogsChannelID = configValue.discord_channels.command_logs;
+        const commandLogsChannelID = configValue.discord_channels.discord_command_logs;
 
         switch(commandResult){
             default:
@@ -738,7 +738,7 @@ ingameBot.on('message', async (chatMSGRaw, chatType) => {
 
         const chatHandler = handlers.get('chat');
 
-        chatHandler.execute(chatMSGRaw, configValue, discordBot, isIngameBotReady, isDiscordBotReady);
+        chatHandler.execute(chatMSGRaw, configValue, discordBot, guildID, isIngameBotReady, isDiscordBotReady);
     } catch {
         console.log('[MCHPB] Error occured while executing chat handler! Restarting the bot...');
         try {

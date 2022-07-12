@@ -7,11 +7,11 @@ module.exports = {
     async execute(regexMatches, discordBot, configValue, guildID){
         try {
 
-            const pveBossSpawnedAlertChannelID = configValue.discord_channels.pve_boss;
+            const pveBossSpawnedAlertChannelID = configValue.discord_channels.pve_boss_spawned;
 
             const pveBossSpawnedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).name;
 
-            const pveBossSpawnedPingRoleID = configValue.roles_id.pve_boss_ping;
+            const pveBossSpawnedPingRoleID = configValue.roles_id.pve_boss_spawned_ping;
 
             const pveBossDetails = regexMatches[0];
 
@@ -70,7 +70,7 @@ module.exports = {
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID) != undefined){
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(pveBossSpawnedAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(pveBossSpawnedAlertChannelID).has('SEND_MESSAGES') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).send({ content: `|| <@&${pveBossSpawnedPingRoleID}> ||`, embeds: [pveBossSpawnedEmbed] });
+                        await discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).send({ content: `|| <@&${pveBossSpawnedPingRoleID}> ||`, embeds: [pveBossSpawnedEmbed] });
                         return true;
                     } else {
                         console.log(`[MCHPB] Error occured while sending pve boss spawned alert in #${pveBossSpawnedAlertChannelName}!`);

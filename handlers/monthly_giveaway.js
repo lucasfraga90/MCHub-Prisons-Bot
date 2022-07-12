@@ -30,7 +30,7 @@ module.exports = {
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(monthlyGiveawayAlertChannelID) != undefined){
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(monthlyGiveawayAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(monthlyGiveawayAlertChannelID).has('SEND_MESSAGES') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(monthlyGiveawayAlertChannelID).send({ embeds: [monthlyGiveawayEmbed] });
+                        await discordBot.guilds.cache.get(guildID).channels.cache.get(monthlyGiveawayAlertChannelID).send({ embeds: [monthlyGiveawayEmbed] });
                         return true;
                     } else {
                         console.log(`[MCHPB] Error occured while sending monthly giveaway alert in #${monthlyGiveawayAlertChannelName}!`);

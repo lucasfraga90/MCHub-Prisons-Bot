@@ -7,11 +7,11 @@ module.exports = {
     async execute(regexMatches, discordBot, configValue, guildID){
         try {
     
-            const beaconMeteorSpawnedAlertChannelID = configValue.discord_channels.beacon_meteor;
+            const beaconMeteorSpawnedAlertChannelID = configValue.discord_channels.beacon_meteor_spawned;
 
             const beaconMeteorSpawnedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).name;
 
-            const beaconMeteorSpawnedPingRoleID = configValue.roles_id.beacon_meteor_ping;
+            const beaconMeteorSpawnedPingRoleID = configValue.roles_id.beacon_meteor_spawned_ping;
 
             const beaconMeteorSpawnedEmbed = new DiscordJS.MessageEmbed()
                 .setColor('#eb8334')
@@ -23,7 +23,7 @@ module.exports = {
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID) != undefined){
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(beaconMeteorSpawnedAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(beaconMeteorSpawnedAlertChannelID).has('SEND_MESSAGES') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).send({ content: `|| <@&${beaconMeteorSpawnedPingRoleID}> ||`, embeds: [beaconMeteorSpawnedEmbed] });
+                        await discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).send({ content: `|| <@&${beaconMeteorSpawnedPingRoleID}> ||`, embeds: [beaconMeteorSpawnedEmbed] });
                         return true;
                     } else {
                         console.log(`[MCHPB] Error occured while sending beacon meteor spawned alert in #${beaconMeteorSpawnedAlertChannelName}!`);

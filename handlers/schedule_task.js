@@ -5,13 +5,13 @@ module.exports = {
     async execute(discordBot, ingameBot, configValue, isDiscordBotReady, isIngameBotReady){
         try {
             setInterval(async () => ingameBot.chat('/server atlantic11'), 180000); 
-            if(configValue.features.next_boss === 'true'){
+            if(configValue.features.upcoming_boss === 'true'){
                 setInterval(async () => ingameBot.chat('/nextboss'), 299500);  
             }
-            if(configValue.features.next_dungeon === 'true'){
+            if(configValue.features.upcoming_dungeon === 'true'){
                 setInterval(async () => ingameBot.chat('/nextdungeon'), 1800000);
             }
-            if(configValue.features.next_bloodbath === 'true'){
+            if(configValue.features.upcoming_bloodbath === 'true'){
                 setInterval(async () => ingameBot.chat('/nextbloodbath'), 3600500);
             } 
             return isIngameBotReady = true;

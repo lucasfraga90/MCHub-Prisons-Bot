@@ -7,11 +7,11 @@ module.exports = {
     async execute(regexMatches, discordBot, configValue, guildID){
         try {
     
-            const dungeonBossSpawnedAlertChannelID = configValue.discord_channels.dungeon_boss;
+            const dungeonBossSpawnedAlertChannelID = configValue.discord_channels.dungeon_boss_spawned;
 
             const dungeonBossSpawnedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonBossSpawnedAlertChannelID).name;
 
-            const dungeonBossSpawnedPingRoleID = configValue.roles_id.dungeon_boss_ping;
+            const dungeonBossSpawnedPingRoleID = configValue.roles_id.dungeon_boss_spawned_ping;
 
             const dungeonDetails = regexMatches[0];
 
@@ -28,7 +28,7 @@ module.exports = {
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonBossSpawnedAlertChannelID) != undefined){
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dungeonBossSpawnedAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dungeonBossSpawnedAlertChannelID).has('SEND_MESSAGES') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonBossSpawnedAlertChannelID).send({ content: `|| <@&${dungeonBossSpawnedPingRoleID}> ||`, embeds: [dungeonBossSpawnedEmbed] });
+                        await discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonBossSpawnedAlertChannelID).send({ content: `|| <@&${dungeonBossSpawnedPingRoleID}> ||`, embeds: [dungeonBossSpawnedEmbed] });
                         return true;
                     } else {
                         console.log(`[MCHPB] Error occured while sending dungeon boss spawned alert in #${dungeonBossSpawnedAlertChannelName}!`);

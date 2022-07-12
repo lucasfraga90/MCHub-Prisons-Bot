@@ -32,7 +32,7 @@ module.exports = {
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(dailyGiveawayAlertChannelID) != undefined){
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dailyGiveawayAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dailyGiveawayAlertChannelID).has('SEND_MESSAGES') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(dailyGiveawayAlertChannelID).send({ embeds: [dailyGiveawayEmbed] });
+                        await discordBot.guilds.cache.get(guildID).channels.cache.get(dailyGiveawayAlertChannelID).send({ embeds: [dailyGiveawayEmbed] });
                         return true;
                     } else {
                         console.log(`[MCHPB] Error occured while sending daily giveaway alert in #${dailyGiveawayAlertChannelName}!`);

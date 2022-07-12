@@ -7,11 +7,11 @@ module.exports = {
     async execute(regexMatches, discordBot, configValue, guildID){
         try {
     
-            const dungeonOpenedAlertChannelID = configValue.discord_channels.dungeon;
+            const dungeonOpenedAlertChannelID = configValue.discord_channels.dungeon_opened;
 
             const dungeonOpenedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID).name;
 
-            const dungeonOpenedPingRoleID = configValue.roles_id.dungeon_ping;
+            const dungeonOpenedPingRoleID = configValue.roles_id.dungeon_opened_ping;
 
             const dungeonOpenedEmbed = new DiscordJS.MessageEmbed()
                 .setColor('#eb8334')
@@ -23,7 +23,7 @@ module.exports = {
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID) != undefined){
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dungeonOpenedAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(dungeonOpenedAlertChannelID).has('SEND_MESSAGES') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID).send({ content: `|| <@&${dungeonOpenedPingRoleID}> ||`, embeds: [dungeonOpenedEmbed] });
+                        await discordBot.guilds.cache.get(guildID).channels.cache.get(dungeonOpenedAlertChannelID).send({ content: `|| <@&${dungeonOpenedPingRoleID}> ||`, embeds: [dungeonOpenedEmbed] });
                         return true;
                     } else {
                         console.log(`[MCHPB] Error occured while sending dungeon opened alert in #${dungeonOpenedAlertChannelName}!`);

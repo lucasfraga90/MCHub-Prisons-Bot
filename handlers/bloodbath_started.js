@@ -7,11 +7,11 @@ module.exports = {
     async execute(regexMatches, discordBot, configValue, guildID){    
         try {
     
-            const bloodbathStartedAlertChannelID = configValue.discord_channels.bloodbath;
+            const bloodbathStartedAlertChannelID = configValue.discord_channels.bloodbath_started;
 
             const bloodbathStartedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(bloodbathStartedAlertChannelID).name;
 
-            const bloodbathStartedPingRoleID = configValue.roles_id.bloodbath_ping;
+            const bloodbathStartedPingRoleID = configValue.roles_id.bloodbath_started_ping;
 
             const bloodbathStartedEmbed = new DiscordJS.MessageEmbed()
                 .setColor('#eb8334')
@@ -23,7 +23,7 @@ module.exports = {
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(bloodbathStartedAlertChannelID) != undefined){
                 if(discordBot.guilds.cache.get(guildID).me.permissionsIn(bloodbathStartedAlertChannelID).has('VIEW_CHANNEL') === true){
                     if(discordBot.guilds.cache.get(guildID).me.permissionsIn(bloodbathStartedAlertChannelID).has('SEND_MESSAGES') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(bloodbathStartedAlertChannelID).send({ content: `|| <@&${bloodbathStartedPingRoleID}> ||`, embeds: [bloodbathStartedEmbed] });
+                        await discordBot.guilds.cache.get(guildID).channels.cache.get(bloodbathStartedAlertChannelID).send({ content: `|| <@&${bloodbathStartedPingRoleID}> ||`, embeds: [bloodbathStartedEmbed] });
                         return true;
                     } else {
                         console.log(`[MCHPB] Error occured while sending bloodbath started alert in #${bloodbathStartedAlertChannelName}!'`);
