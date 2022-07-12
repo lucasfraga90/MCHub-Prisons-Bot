@@ -4,11 +4,11 @@
 ## FEATURES:
 #### - Daily, Weekly & Monthly Giveaway Winners Alert.
 #### - Global Booster Alert.
-#### - PvE Boss Spawned Alert.
+#### - Upcoming PvE Boss & PvE Boss Spawned Alert.
 #### - Dungeon Boss Spawned Alert.
-#### - Dungeon Opened Alert.
+#### - Upcoming Dungeon & Dungeon Opened Alert.
 #### - Beacon Meteor Spawned Alert.
-#### - Bloodbath Started Alert.
+#### - Upcoming Bloodbath & Bloodbath Started Alert.
 #### - Log Ingame Messages To Discord.
 #### - Log Command Usage & Chat Alert Status.
 #### - Blacklist People From Using The Bot.
