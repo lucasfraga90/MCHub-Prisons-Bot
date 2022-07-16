@@ -120,6 +120,8 @@ let isDiscordBotReady = false, isIngameBotReady = false;
 
 let errorHandler, configValue, ingameBot, consoleChatBox, guildID, clientID;
 
+let chatMessages = new Array();
+
 function isImportantDIRsExists(){
     console.log('[MCHPB] Loading important directories...');
     try {
@@ -736,9 +738,20 @@ ingameBot.on('message', async (chatMSGRaw, chatType) => {
     try {
         if(chatType === 'game_info') return;
 
-        const chatHandler = handlers.get('chat');
+        async function logIngameChatToConsole(){
+            if(configValue.features.log_ingame_chat_to_console === 'true') return console.log(chatMSGRaw.toAnsi());
+        }
 
-        chatHandler.execute(chatMSGRaw, configValue, discordBot, guildID, isIngameBotReady, isDiscordBotReady);
+        logIngameChatToConsole();
+        if(chatMSGRaw.toString().length <= 5) return;
+        if(chatMessages.length <= 9){
+            chatMessages.push(chatMSGRaw);
+        } else {
+
+            const chatHandler = handlers.get('chat');
+
+            chatHandler.execute(chatMessages, configValue, discordBot, guildID, isDiscordBotReady, isIngameBotReady);
+        }
     } catch {
         console.log('[MCHPB] Error occured while executing chat handler! Restarting the bot...');
         try {
