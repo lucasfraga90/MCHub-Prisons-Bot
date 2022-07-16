@@ -701,7 +701,7 @@ ingameBot.once('spawn', async onceSpawnIngameBot => {
     try {
         if(await registerChatPattern() === true){
             console.log('[MCHPB] Successfully registered chat patterns.');
-            setTimeout(async () => ingameBot.chat('/server atlantic11'), 10000);
+            setTimeout(async () => ingameBot.chat('/server atlantic12'), 10000);
 
             const scheduleTaskHandler = handlers.get('schedule_task');
             

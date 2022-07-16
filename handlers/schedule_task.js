@@ -4,8 +4,8 @@ module.exports = {
     },
     async execute(discordBot, ingameBot, configValue, isDiscordBotReady, isIngameBotReady){
         try {
-            setInterval(async () => ingameBot.chat('/server atlantic11'), 180000); 
-            if(configValue.features.upcoming_boss === 'true'){
+            setInterval(async () => ingameBot.chat('/server atlantic12'), 180000); 
+            if(configValue.features.upcoming_pve_boss === 'true'){
                 setInterval(async () => ingameBot.chat('/nextboss'), 299500);  
             }
             if(configValue.features.upcoming_dungeon === 'true'){
