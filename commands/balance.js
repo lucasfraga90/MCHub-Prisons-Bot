@@ -32,9 +32,18 @@ module.exports = {
 				.setRequired(true)
 				.setMinLength(3)
 				.setMaxLength(15)))
+		.addSubcommand(pearl =>
+			pearl.setName('pearl')
+			.setDescription("Shows A Player's Pearl Balance.")
+			.addStringOption(playerIGN =>
+				playerIGN.setName('player-ign')
+				.setDescription('Minecraft Username.')
+				.setRequired(true)
+				.setMinLength(3)
+				.setMaxLength(15)))
 		.addSubcommand(omnitool_rename => 
 			omnitool_rename.setName('omnitool-rename')
-			.setDescription("Shows A Player's Omnitool Rename Balance")
+			.setDescription("Shows A Player's Omnitool Rename Balance.")
 			.addStringOption(playerIGN =>
 				playerIGN.setName('player-ign')
 				.setDescription('Minecraft Username.')
@@ -147,6 +156,36 @@ module.exports = {
 					await prisonsBot.chat(`/bosscreditsbal ${playerIGN}`);
 					await getPlayerBossCreditBalanceMessage;
 					break;
+				case 'pearl':
+
+					const playerPearlBalanceMessageStringRegex = `^MCHUB \» ${playerIGN} has ([0-9]+) Pearls\!`;
+	
+					const playerPearlBalanceMessageRegex = new RegExp(playerPearlBalanceMessageStringRegex, 'm');
+	
+					const getPlayerPearlBalanceMessage = prisonsBot.findMessage(5000, playerPearlBalanceMessageRegex).then(getPlayerPearlBalanceMessageResult => {
+						if(getPlayerPearlBalanceMessageResult === false){
+							discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s pearl balance!` + '```', ephemeral: true });
+					
+							discordSlashCommandResult = false;
+
+						} else {
+
+							const playerPearlBalanceDetails = String(getPlayerPearlBalanceMessageResult).match(playerPearlBalanceMessageRegex);
+	
+							const playerPearlBalance = playerPearlBalanceDetails[1];
+	
+							const playerPearlBalanceInfo = `IGN: ${playerIGN} | Pearl Balance: ${playerPearlBalance}`;
+	
+							discordSlashCommandDetails.editReply({ content: '```' + playerPearlBalanceInfo + '```', ephemeral: true });
+					
+							discordSlashCommandResult = true;
+
+						}
+					});
+	
+					await prisonsBot.chat(`/pearlbal ${playerIGN}`);
+					await getPlayerPearlBalanceMessage;
+					break;
 				case 'omnitool-rename':
 					
 					const playerOmnitoolRenameBalanceMessageStringRegex = `^Renames \» ${playerIGN} has ([0-9,]+) renames\!`;
@@ -154,7 +193,7 @@ module.exports = {
 					const playerOmnitoolRenameBalanceMessageRegex = new RegExp(playerOmnitoolRenameBalanceMessageStringRegex, 'm');
 	
 					const getPlayerOmnitoolRenameBalanceMessage = prisonsBot.findMessage(5000, playerOmnitoolRenameBalanceMessageRegex).then(getPlayerOmnitoolRenameBalanceMessageResult => {
-						if(getPlayerOmnitoolRenameBalanceMessage === false){
+						if(getPlayerOmnitoolRenameBalanceMessageResult === false){
 							discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s omnitool rename balance!` + '```', ephemeral: true });
 					
 							discordSlashCommandResult = false;
