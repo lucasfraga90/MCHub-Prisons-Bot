@@ -1,6 +1,6 @@
 # MCHub-Prisons-Discord-Bot
 
-[![Community Discord](https://img.shields.io/static/v1.svg?label=COMMUNITY&message=DISCORD&color=blue&logo=discord&style=for-the-badge)](https://discord.gg/RtZyHNeM8b)
+[![MCHub Unofficial Community Discord](https://img.shields.io/static/v1.svg?label=COMMUNITY&message=DISCORD&color=blue&logo=discord&style=for-the-badge)](https://discord.gg/RtZyHNeM8b)
 
 ## FEATURES:
 #### - Daily, Weekly & Monthly Giveaway Winners Alert.
@@ -10,6 +10,7 @@
 #### - Upcoming Dungeon & Dungeon Opened Alert.
 #### - Beacon Meteor Spawned Alert.
 #### - Upcoming Bloodbath & Bloodbath Started Alert.
+#### - Check Ranktop, Baltop, Beacontop, Pearltop & Bosscreditstop Through Discord.
 #### - Log Ingame Messages To Discord.
 #### - Log Command Usage & Chat Alert Status.
 #### - Blacklist People From Using The Bot.
@@ -26,11 +27,9 @@
 ## [INSTALLATION](https://www.youtube.com/playlist?list=PLwsD_Qp4brFf3UgPyncp5ff0CndvL1J0Q "YouTube Playlist"):
 #### 1. Download the installer. [[HERE](https://github.com/QimieGames/MCHub-Prisons-Bot/releases "MCHub Prisons Bot Installer Download Page")]
 #### 2. Run the installer.
-#### 3. Run "MCHub Prisons Bot.exe".
-#### 4. Close it.
-#### 5. Configure .env & config file correctly.
-#### 6. Run "MCHub Prisons Bot.exe".
-#### 7. Done, enjoy!
+#### 3. Configure .env & config file correctly.
+#### 4. Run "MCHub Prisons Bot.exe".
+#### 5. Done, enjoy!
 
 ## [REPORT BUGS HERE](https://github.com/QimieGames/MCHub-Prisons-Bot/issues "Report Issue(s)/Bug(s)")
 

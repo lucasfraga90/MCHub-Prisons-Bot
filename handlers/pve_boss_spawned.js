@@ -7,15 +7,15 @@ module.exports = {
     async execute(regexMatches, discordBot, configValue, guildID){
         try {
 
-            const pveBossSpawnedAlertChannelID = configValue.discord_channels.pve_boss_spawned;
+            const pveBossSpawnedAlertChannelID = configValue.discord_channel.pve_boss_spawned;
 
             const pveBossSpawnedAlertChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).name;
 
-            const pveBossSpawnedPingRoleID = configValue.roles_id.pve_boss_spawned_ping;
+            const pveBossSpawnedPingRoleID = configValue.role_id.pve_boss_spawned_ping;
 
             const pveBossDetails = regexMatches[0];
 
-            const pveBossName = pveBossDetails[1];
+            const pveBossName = String(pveBossDetails[1]);
 
             let pveBossType = pveBossDetails[0], pveBossSpawnedThumbnailURL;
 
@@ -59,31 +59,34 @@ module.exports = {
                     break;
             }
 
-            const pveBossSpawnedEmbed = new DiscordJS.MessageEmbed()
-                .setColor('#eb8334')
-                .setTitle('PVE BOSS SPAWNED')
-                .setDescription(`Boss Type: ${pveBossType}\n` + `Boss Name: ${pveBossName}`)
-                .setThumbnail(`${pveBossSpawnedThumbnailURL}`)
+            const pveBossSpawnedEmbedDescription =
+
+            `Boss Type: ${pveBossType}
+            Boss Name: ${pveBossName}`;
+
+            const pveBossSpawnedEmbed = new DiscordJS.EmbedBuilder()
+                .setColor('#4422bf')
+                .setTitle('PVE BOSS')
+                .setDescription(pveBossSpawnedEmbedDescription)
+                .setThumbnail(pveBossSpawnedThumbnailURL)
                 .setTimestamp()
                 .setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
     
-            if(discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID) != undefined){
-                if(discordBot.guilds.cache.get(guildID).me.permissionsIn(pveBossSpawnedAlertChannelID).has('VIEW_CHANNEL') === true){
-                    if(discordBot.guilds.cache.get(guildID).me.permissionsIn(pveBossSpawnedAlertChannelID).has('SEND_MESSAGES') === true){
+            if(discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID) !== undefined){
+                if(discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).permissionsFor(discordBot.user.id).has('ViewChannel') === true){
+                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).permissionsFor(discordBot.user.id).has('SendMessages') === true){
                         await discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).send({ content: `|| <@&${pveBossSpawnedPingRoleID}> ||`, embeds: [pveBossSpawnedEmbed] });
                         return true;
                     } else {
                         console.log(`[MCHPB] Error occured while sending pve boss spawned alert in #${pveBossSpawnedAlertChannelName}!`);
-                        return false;
                     }
                 } else {
                     console.log(`[MCHPB] Error occured while viewing #${pveBossSpawnedAlertChannelName}!`);
-                    return false;
                 }
             } else {
                 console.log('[MCHPB] Error occured while finding pve boss spawned alert channel!');
-                return false;
             }
+            return false;
         } catch {
 			return 'ERROR';
         }

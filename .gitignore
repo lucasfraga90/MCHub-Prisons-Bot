@@ -1,5 +1,6 @@
-.env
+*.env
 config.json
 node_modules/
 *.bat
 error_logs/*
+BACKUP/
