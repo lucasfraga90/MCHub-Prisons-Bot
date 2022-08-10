@@ -1025,6 +1025,10 @@ prisonsBot.on('message', async (chatMessage, chatPosition) => {
 
 async function logChatEvent(chatEventName, chatEventResult){
     try {
+
+        const chatEventChannelID = configValue.discord_channel[chatEventName];
+
+        const chatEventChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventChannelID).name;
         
         const underscoreRegex = new RegExp(/([_])/, 'g');
 
@@ -1056,10 +1060,6 @@ async function logChatEvent(chatEventName, chatEventResult){
             console.log(`[MCHPB] Chat Event Name: ${chatEventName} | Chat Event Result: ${chatEventResult}`);
         }
         if(configValue.feature.log_chat_event_to_discord === 'true'){
-
-            const chatEventChannelID = configValue.discord_channel[chatEventName];
-
-            const chatEventChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventChannelID).name;
 
             const chatEventLogChannelID = configValue.discord_channel.chat_event;
 
