@@ -4,7 +4,7 @@ module.exports = {
     data: {
         name: 'dungeon_boss_spawned'
     },
-    async execute(regexMatches, discordBot, configValue, guildID){
+    async execute(regexMatches, guildID, configValue, discordBot){
         try {
     
             const dungeonBossSpawnedAlertChannelID = configValue.discord_channel.dungeon_boss_spawned;

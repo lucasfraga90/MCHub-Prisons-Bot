@@ -141,38 +141,48 @@ function doesImportantFilesExists(){
     console.log('[MCHPB] Loading important files...');
     try {
 
-        const defaultHandlerFiles = ['beacon_meteor_spawned.js', 'bloodbath_started.js', 'dungeon_boss_spawned.js', 'dungeon_opened.js', 'error.js', 'gangtop.js', 'giveaway.js', 'global_booster.js', 'leaderboard.js', 'pve_boss_spawned.js', 'schedule_tasks.js', 'upcoming_bloodbath.js', 'upcoming_dungeon.js', 'upcoming_pve_boss.js'];
+        const defaultHandlerFiles = ['beacon_meteor_spawned.js', 'bloodbath_started.js', 'dungeon_boss_spawned.js', 'dungeon_opened.js', 'error.js', 'giveaway.js', 'global_booster.js', 'leaderboard.js', 'pve_boss_spawned.js', 'schedule_tasks.js', 'upcoming_bloodbath.js', 'upcoming_dungeon.js', 'upcoming_pve_boss.js'];
 
-        const defaultDiscordSlashCommandFiles = ['balance.js', 'bb.js', 'help.js', 'leaderboard.js', 'rank.js', 'reconnect.js', 'restart.js', 'sync.js', 'unsync.js'];
+        const defaultDiscordSlashCommandFiles = ['balance.js', 'help.js', 'leaderboard.js', 'reconnect.js', 'restart.js', 'stats.js', 'sync.js', 'unsync.js'];
 
         const currentHandlerFiles = nodeFS.readdirSync(importantDIRs.handler, 'utf-8').filter(currentHandlerFilesName => currentHandlerFilesName.endsWith('.js'));
 
         const currentDiscordSlashCommandFiles = nodeFS.readdirSync(importantDIRs.command, 'utf-8').filter(currentDiscordSlashCommandFilesName => currentDiscordSlashCommandFilesName.endsWith('.js'));
         
+        let doesImportantFilesExistsResult = true;
+
         currentHandlerFiles.forEach(currentHandlerFileName => {
             if(defaultHandlerFiles.includes(currentHandlerFileName) === false){
-                return false;
+
+                doesImportantFilesExistsResult = false;
+
             }
         });
         defaultHandlerFiles.forEach(defaultHandlerFileName => {
             if(currentHandlerFiles.includes(defaultHandlerFileName) === false){
-                return false;
+                
+                doesImportantFilesExistsResult = false;
+
             }
         });
         currentDiscordSlashCommandFiles.forEach(currentDiscordSlashCommandFileName => {
             if(defaultDiscordSlashCommandFiles.includes(currentDiscordSlashCommandFileName) === false){
-                return false;
+                
+                doesImportantFilesExistsResult = false;
+
             }
         });
         defaultDiscordSlashCommandFiles.forEach(defaultDiscordSlashCommandFileName => {
             if(currentDiscordSlashCommandFiles.includes(defaultDiscordSlashCommandFileName) === false){
-                return false;
+                
+                doesImportantFilesExistsResult = false;
+
             }
         });
         nodeFS.accessSync('package.json', nodeFS.constants.F_OK);
         nodeFS.accessSync('package-lock.json', nodeFS.constants.F_OK);
         nodeFS.accessSync('LICENSE', nodeFS.constants.F_OK);
-        return true;
+        return doesImportantFilesExistsResult;
     } catch {
         return false;
     }
@@ -251,7 +261,7 @@ function isConfigFileValid(){
 
         configValue = JSON.parse(nodeFS.readFileSync('config.json', 'utf-8'));
 
-        let defaultConfigObjects = new Array(), currentConfigObjects = new Array();
+        let isConfigFileValidResult = true, defaultConfigObjects = new Array(), currentConfigObjects = new Array();
 
         Object.keys(defaultConfigFileLayout).forEach(defaultConfigMainObject => {
             defaultConfigObjects.push(defaultConfigMainObject);
@@ -267,15 +277,19 @@ function isConfigFileValid(){
         });
         currentConfigObjects.forEach(currentConfigObject => {
             if(defaultConfigObjects.includes(currentConfigObject) === false){
-                return false;
+                
+                isConfigFileValidResult = false;
+
             }
         });
         defaultConfigObjects.forEach(defaultConfigObject => {
             if(currentConfigObjects.includes(defaultConfigObject) === false){
-                return false;
+                
+                isConfigFileValidResult = false;
+
             }
         });
-        return true;
+        return isConfigFileValidResult;
     } catch {
         return false;
     }
@@ -375,10 +389,19 @@ try {
         console.log('[MCHPB] Successfully loaded important directories & files.');    
         if(registerHandlers() === true){
             console.log('[MCHPB] Successfully registered handlers.');
+            console.log('[MCHPB] Connecting to the Discord Bot...');
             discordBot.login(process.env.DISCORD_BOT_TOKEN).then(() => {
-                console.log('[MCHPB] Connecting to the Discord Bot...');
+                console.log('[MCHPB] Connected to the Discord Bot.'); 
+            }).catch(discordBotLoginError => {
+                console.log('[MCHPB] Error occured while connecting to the Discord Bot! Restarting prisons bot...');
+                try {
+                    errorHandler.execute(discordBotLoginError, discordBot, prisonsBot);
+                    return process.exit(0);
+                } catch {
+                    console.log('[MCHPB] Error occured while executing error handler! Force restarting prisons bot...');
+                    return process.exit(0);
+                }
             });
-            console.log('[MCHPB] Connecting to MCHub.COM...');
 
             prisonsBot = mineflayer.createBot({ host: 'MCHub.COM', version: '1.18.2', username: process.env.INGAME_BOT_EMAIL, password: process.env.INGAME_BOT_PASSWORD, auth: 'microsoft', keepAlive: true, checkTimeoutInterval: 60000 });
 
@@ -396,7 +419,7 @@ try {
 }
 
 process.on('unhandledRejection', proccessOnUnhandledRejectionError => {
-    console.log('[MCHPB] Unhandled Rejection! Restarting prisons bot...');
+    console.log('[MCHPB] Process Unhandled Rejection! Restarting prisons bot...');
     try {
         errorHandler.execute(proccessOnUnhandledRejectionError, discordBot, prisonsBot);
         return process.exit(0);
@@ -407,7 +430,7 @@ process.on('unhandledRejection', proccessOnUnhandledRejectionError => {
 });
 
 process.on('uncaughtException', proccessOnUncaughtExceptionError => {
-    console.log('[MCHPB] Uncaught Exception! Restarting prisons bot...');
+    console.log('[MCHPB] Process Uncaught Exception! Restarting prisons bot...');
     try {
         errorHandler.execute(proccessOnUncaughtExceptionError, discordBot, prisonsBot);
         return process.exit(0);
@@ -465,19 +488,17 @@ async function isConfigValuesValid(){
     console.log('[MCHPB] Validating config values...');
     try {
 
-        let discordBotGuildsID = new Array(), discordBotGuildRolesID = new Array(), discordBotGuildChannelsID = new Array();
+        let isConfigValuesValidResult = true, discordBotGuildsID = new Array(), discordBotGuildRolesID = new Array(), discordBotGuildChannelsID = new Array();
 
         if(typeof Number(configValue.discord_bot.guild_id) !== 'number'){
             return false;
         } else {
 
-            const getDiscordBotGuildsID = discordBot.guilds.fetch().then(discordBotGuildsFetchResult => {
+            await discordBot.guilds.fetch().then(discordBotGuildsFetchResult => {
                 discordBotGuildsFetchResult.forEach(discordBotGuildFetchResult => {
                     discordBotGuildsID.push(discordBotGuildFetchResult.id);
                 });
             });
-    
-            await getDiscordBotGuildsID;
             if(discordBotGuildsID.includes(configValue.discord_bot.guild_id) !== true){
                 return false;
             } else {
@@ -497,60 +518,71 @@ async function isConfigValuesValid(){
 
             }
         }
-
-        const getDiscordBotGuildChannelsID = discordBot.guilds.cache.get(configValue.discord_bot.guild_id).channels.fetch().then(discordBotGuildChannelsFetchResult => {
+        await discordBot.guilds.cache.get(configValue.discord_bot.guild_id).channels.fetch().then(discordBotGuildChannelsFetchResult => {
             discordBotGuildChannelsFetchResult.forEach(discordBotGuildChannelFetchResult => {
                 discordBotGuildChannelsID.push(discordBotGuildChannelFetchResult.id);
             });
         });
-
-        await getDiscordBotGuildChannelsID;
-
-        const getDiscordBotGuildRolesID = discordBot.guilds.cache.get(configValue.discord_bot.guild_id).roles.fetch().then(discordBotGuildRolesFetchResult => {
+        await discordBot.guilds.cache.get(configValue.discord_bot.guild_id).roles.fetch().then(discordBotGuildRolesFetchResult => {
             discordBotGuildRolesFetchResult.forEach(discordBotGuildRoleFetchResult => {
                 discordBotGuildRolesID.push(discordBotGuildRoleFetchResult.id);
             });
         });
-
-        await getDiscordBotGuildRolesID;
-
         Object.keys(configValue).forEach(configValueMainObject => {
             Object.keys(configValue[configValueMainObject]).forEach(configValueSecondaryObject => {
                 switch(configValueMainObject){
                     case 'prisons_bot':
                         if(typeof Number(configValue.prisons_bot.season) !== 'number'){
-                            return false;
+                            
+                            isConfigValuesValidResult = false;
+
                         }
                         break;
                     case 'discord_channel':
                         if(typeof Number(configValue.discord_channel[configValueSecondaryObject]) !== 'number'){
-                            return false;
+                            
+                            isConfigValuesValidResult = false;
+                            
                         } else {
                             if(discordBotGuildChannelsID.includes(configValue.discord_channel[configValueSecondaryObject]) !== true){
-                                return false;
+                            
+                                isConfigValuesValidResult = false;
+                                
                             }
                         }
                         break;
                     case 'feature':
                         if(typeof Boolean(configValue.feature[configValueSecondaryObject]) !== 'boolean'){
-                            return false;
+                            
+                            isConfigValuesValidResult = false;
+                            
                         }
                         break;
                     case 'role_id':
                         if(typeof Number(configValue.role_id[configValueSecondaryObject]) !== 'number'){
-                            return false;
+                            
+                            isConfigValuesValidResult = false;
+                            
                         } else {
                             if(discordBotGuildRolesID.includes(configValue.role_id[configValueSecondaryObject]) !== true){
-                                return false;
+                            
+                                isConfigValuesValidResult = false;
+                                
                             }
                         }
                         break;
                 }
             });
         });
-        return true;
+        return isConfigValuesValidResult;
     } catch(isConfigValuesValidError) {
-        return isConfigValuesValidError;
+        console.log('[MCHPB] Error occured while validating config values! Restarting prisons bot...');
+        try {
+            errorHandler.execute(isConfigValuesValidError, discordBot, prisonsBot);
+        } catch {
+            console.log('[MCHPB] Error occured while executing error handler! Force restarting prisons bot...');
+            return process.exit(0);
+        }
     }
 }
 
@@ -580,13 +612,12 @@ async function syncDiscordSlashCommands(){
     }
 }
 
-discordBot.once('ready', () => {
-    console.log('[MCHPB] Connected to the Discord Bot.'); 
+discordBot.once('ready', async () => {
     try {
-        isConfigValuesValid().then(isConfigValuesValidResult => {
+        await isConfigValuesValid().then(async isConfigValuesValidResult => {
             if(isConfigValuesValidResult === true){
                 console.log('[MCHPB] Successfully validated config values.');
-                syncDiscordSlashCommands().then(syncDiscordSlashCommandsResult => {
+                await syncDiscordSlashCommands().then(syncDiscordSlashCommandsResult => {
                     if(syncDiscordSlashCommandsResult === true){
                         console.log('[MCHPB] Successfully synchronized slash commands.');
                     } else {
@@ -601,10 +632,11 @@ discordBot.once('ready', () => {
                     }
                 });
             } else {
-                console.log('[MCHPB] Error occured while validating config values! Please make sure you configure the config file correctly.');
+                console.log('[MCHPB] Invalid config values! Please make sure you configure the config file correctly.');
                 return process.exit(1);
             }
         });
+        return;
     } catch(discordBotOnceReadyError) {
         console.log('[MCHPB] Error occured while executing discord bot once ready tasks! Restarting prisons bot...');
         try {
@@ -617,7 +649,7 @@ discordBot.once('ready', () => {
     }
 });
 
-function logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult){
+async function logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult){
     try {
 
         const discordSlashCommandName = discordSlashCommandDetails.commandName.toUpperCase();
@@ -678,7 +710,7 @@ function logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCom
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(discordSlashCommandLogChannelID) !== undefined){
                 if(discordBot.guilds.cache.get(guildID).channels.cache.get(discordSlashCommandLogChannelID).permissionsFor(clientID).has('ViewChannel') === true){
                     if(discordBot.guilds.cache.get(guildID).channels.cache.get(discordSlashCommandLogChannelID).permissionsFor(clientID).has('SendMessages') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(discordSlashCommandLogChannelID).send({ embeds: [discordSlashCommandLogEmbed] });
+                        await discordBot.guilds.cache.get(guildID).channels.cache.get(discordSlashCommandLogChannelID).send({ embeds: [discordSlashCommandLogEmbed] });
                     } else {
                         console.log(`[MCHPB] Error occured while logging discord slash command usage in #${discordSlashCommandLogChannelName}!`);
                     }
@@ -710,8 +742,8 @@ discordBot.on('interactionCreate', async discordSlashCommandDetails => {
         const prisonsBotBlacklistedRoleID = configValue.role_id.bot_blacklisted;
 
         if(discordSlashCommandDetails.member.roles.cache.some(discordSlashCommandUserRole => discordSlashCommandUserRole.id === prisonsBotBlacklistedRoleID) === true){
-            await discordSlashCommandDetails.editReply({ content: '```You are blacklisted from using prisons bot!```', ephemeral: true }).then(() => {
-                logDiscordSlashCommandUsage(discordSlashCommandDetails, false);
+            await discordSlashCommandDetails.editReply({ content: '```You are blacklisted from using prisons bot!```', ephemeral: true }).then(async () => {
+                await logDiscordSlashCommandUsage(discordSlashCommandDetails, false);
             });
         } else {
 
@@ -719,81 +751,41 @@ discordBot.on('interactionCreate', async discordSlashCommandDetails => {
 
             switch(discordSlashCommandDetails.commandName){
                 case 'balance':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, prisonsBot).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
-                    });
-                    break;
-                case 'bb':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, prisonsBot).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
-                    });
-                    break;
-                case 'bbtop':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
-                    });
-                    break;
-                case 'beacontop':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
-                    });
-                    break;
-                case 'bosscredittop':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
-                    });
-                    break;
-                case 'ettop':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
-                    });
-                    break;
-                case 'gangtop':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
+                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, prisonsBot).then(async discordSlashCommandResult => {
+                        await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
                     });
                     break;
                 case 'help':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
+                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(async discordSlashCommandResult => {
+                        await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
                     });
                     break;
-                case 'pearltop':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
-                    });
-                    break;
-                case 'rank':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, prisonsBot).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
-                    });
-                    break;
-                case 'ranktop':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
+                case 'leaderboard':
+                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(async discordSlashCommandResult => {
+                        await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
                     });
                     break;
                 case 'reconnect':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, configValue, prisonsBot).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
-                    });
-                    break;
-                case 'renametop':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
+                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, configValue, prisonsBot).then(async discordSlashCommandResult => {
+                        await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
                     });
                     break;
                 case 'restart':
                     await discordSlashCommandHandler.execute(discordSlashCommandDetails, configValue, discordBot, prisonsBot, logDiscordSlashCommandUsage);
                     break;
+                case 'stats':
+                    await discordSlashCommandHandler.execute().then(async discordSlashCommandResult => {
+                        await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
+                    });
+                    break;
                 case 'sync':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, prisonsBot, configValue).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
+                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, prisonsBot, configValue).then(async discordSlashCommandResult => {
+                        await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
                     });
                     break;
                 case 'unsync':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, configValue).then(discordSlashCommandResult => {
-                        logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
+                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, configValue).then(async discordSlashCommandResult => {
+                        await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
                     });
                     break;
             }
@@ -802,8 +794,8 @@ discordBot.on('interactionCreate', async discordSlashCommandDetails => {
     } catch(discordBotOnInteractionCreateError) {
         console.log('[MCHPB] Error occured while executing discord bot on interaction create tasks! Restarting prisons bot...');
         try {
-            await discordSlashCommandDetails.editReply({ content: '```Error occured while executing this discord slash command handler!```', ephemeral: true }).then(() => {
-                logDiscordSlashCommandUsage(discordSlashCommandDetails, 'ERROR');
+            await discordSlashCommandDetails.editReply({ content: '```Error occured while executing this discord slash command handler!```', ephemeral: true }).then(async () => {
+                await logDiscordSlashCommandUsage(discordSlashCommandDetails, 'ERROR');
             });
             errorHandler.execute(discordBotOnInteractionCreateError, discordBot, prisonsBot);
             return process.exit(0);
@@ -814,7 +806,7 @@ discordBot.on('interactionCreate', async discordSlashCommandDetails => {
     }
 });
 
-async function registerChatPattern(){
+async function registerChatPatterns(){
     console.log('[MCHPB] Registering chat patterns...');
     try {
         Object.keys(chatEvents).forEach(chatEventName => {
@@ -828,16 +820,20 @@ async function registerChatPattern(){
     }
 }
 
-prisonsBot.once('spawn', () => {
+prisonsBot.once('login', async () => {
+    console.log('[MCHPB] Connecting to MCHub.COM...');
+});
+
+prisonsBot.once('spawn', async () => {
     console.log('[MCHPB] Connected to MCHub.COM.');
     try {
-        registerChatPattern().then(registerChatPatternsResult => {
+        await registerChatPatterns().then(async registerChatPatternsResult => {
             if(registerChatPatternsResult === true){
             console.log('[MCHPB] Successfully registered chat patterns.');
 
             const scheduleTasksHandler = handlers.get('schedule_tasks');
 
-            scheduleTasksHandler.execute(prisonsBot, configValue).then(scheduleTasksHandlerResult => {
+            await scheduleTasksHandler.execute(configValue, prisonsBot).then(scheduleTasksHandlerResult => {
                 if(scheduleTasksHandlerResult === true){
                     console.log('[MCHPB] Successfully scheduled tasks.');
                     discordBot.user.setActivity('MCHub.COM - Atlantic Prisons' , { type: DiscordJS.ActivityType.Playing, name: 'MCHub.COM - Atlantic Prisons' });
@@ -863,6 +859,7 @@ prisonsBot.once('spawn', () => {
                 }
             }
         });
+        return;
     } catch(prisonsBotOnceSpawnError) {
         console.log('[MCHPB] Error occured while executing prisons bot once spawn tasks! Restarting prisons bot...');
         try {
@@ -918,7 +915,7 @@ function isMessageAPrivateMessage(chatMessage){
     }
 }
 
-function logPrivateMessage(privateMessage){
+async function logPrivateMessage(privateMessage){
     try {
         if(configValue.feature.log_private_message_to_console === 'true'){
             console.log(privateMessage.toAnsi());
@@ -932,7 +929,7 @@ function logPrivateMessage(privateMessage){
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(privateMessageLogChannelID) !== undefined){
                 if(discordBot.guilds.cache.get(guildID).channels.cache.get(privateMessageLogChannelID).permissionsFor(clientID).has('ViewChannel') === true){
                     if(discordBot.guilds.cache.get(guildID).channels.cache.get(privateMessageLogChannelID).permissionsFor(clientID).has('SendMessages') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(privateMessageLogChannelID).send('```' + privateMessage + '```');
+                        await discordBot.guilds.cache.get(guildID).channels.cache.get(privateMessageLogChannelID).send('```' + privateMessage + '```');
                     } else {
                         console.log(`[MCHPB] Error occured while logging private message in #${privateMessageLogChannelName}!`);
                     }
@@ -956,7 +953,7 @@ function logPrivateMessage(privateMessage){
     }
 }
 
-function logGlobalChat(globalChatMessage){
+async function logGlobalChat(globalChatMessage){
     try {
         if(configValue.feature.log_global_chat_to_console === 'true'){
             console.log(globalChatMessage.toAnsi());
@@ -976,8 +973,9 @@ function logGlobalChat(globalChatMessage){
                     if(discordBot.guilds.cache.get(guildID).channels.cache.get(globalChatLogChannelID) !== undefined){
                         if(discordBot.guilds.cache.get(guildID).channels.cache.get(globalChatLogChannelID).permissionsFor(clientID).has('ViewChannel') === true){
                             if(discordBot.guilds.cache.get(guildID).channels.cache.get(globalChatLogChannelID).permissionsFor(clientID).has('SendMessages') === true){
-                                discordBot.guilds.cache.get(guildID).channels.cache.get(globalChatLogChannelID).send('```' + bulkGlobalChatMessage + '```');
-                                bulkChatMessages.splice(0, bulkChatMessages.length);
+                                await discordBot.guilds.cache.get(guildID).channels.cache.get(globalChatLogChannelID).send('```' + bulkGlobalChatMessage + '```').then(() => {
+                                    bulkChatMessages.splice(0, bulkChatMessages.length);
+                                });
                             } else {
                                 console.log(`[MCHPB] Error occured while logging global chat in #${globalChatLogChannelName}!`);
                             }
@@ -1007,9 +1005,9 @@ prisonsBot.on('message', async (chatMessage, chatPosition) => {
     try {
         if(chatPosition !== 'game_info'){
             if(isMessageAPrivateMessage(chatMessage) === true){
-                logPrivateMessage(chatMessage);
+                await logPrivateMessage(chatMessage);
             } else {
-                logGlobalChat(chatMessage);
+                await logGlobalChat(chatMessage);
             }
         }
         return;
@@ -1025,12 +1023,8 @@ prisonsBot.on('message', async (chatMessage, chatPosition) => {
     }
 });
 
-function logChatEvent(chatEventName, chatEventResult){
+async function logChatEvent(chatEventName, chatEventResult){
     try {
-
-        const chatEventChannelID = configValue.discord_channel[chatEventName];
-
-        const chatEventChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventChannelID).name;
         
         const underscoreRegex = new RegExp(/([_])/, 'g');
 
@@ -1063,6 +1057,10 @@ function logChatEvent(chatEventName, chatEventResult){
         }
         if(configValue.feature.log_chat_event_to_discord === 'true'){
 
+            const chatEventChannelID = configValue.discord_channel[chatEventName];
+
+            const chatEventChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventChannelID).name;
+
             const chatEventLogChannelID = configValue.discord_channel.chat_event;
 
             const chatEventLogChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventLogChannelID).name;
@@ -1085,7 +1083,7 @@ function logChatEvent(chatEventName, chatEventResult){
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventLogChannelID) !== undefined){
                 if(discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventLogChannelID).permissionsFor(clientID).has('ViewChannel') === true){
                     if(discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventLogChannelID).permissionsFor(clientID).has('SendMessages') === true){
-                        discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventLogChannelID).send({ embeds: [chatEventLogEmbed] });
+                        await discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventLogChannelID).send({ embeds: [chatEventLogEmbed] });
                     } else {
                         console.log(`[MCHPB] Error occured while logging chat event log in #${chatEventLogChannelName}!`);
                     }
@@ -1116,8 +1114,8 @@ Object.keys(chatEvents).forEach(async chatEventName => {
 
                 const chatEventHandler = handlers.get(chatEventName);
 
-                await chatEventHandler.execute(regexMatches, discordBot, configValue, guildID).then(chatEventResult => {
-                    logChatEvent(chatEventName, chatEventResult);
+                await chatEventHandler.execute(regexMatches, guildID, configValue, discordBot).then(async chatEventResult => {
+                    await logChatEvent(chatEventName, chatEventResult);
                 });
                 return;
             } catch(prisonsBotOnChatEventError) {

@@ -4,7 +4,7 @@ module.exports = {
     data: {
         name: 'upcoming_pve_boss'
     },
-    async execute(regexMatches, discordBot, configValue, guildID){
+    async execute(regexMatches, guildID, configValue, discordBot){
         try {
     
             const upcomingPvEBossAlertChannelID = configValue.discord_channel.upcoming_pve_boss;

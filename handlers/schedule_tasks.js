@@ -2,7 +2,7 @@ module.exports = {
     data: {
         name: 'schedule_tasks'
     },
-    async execute(prisonsBot, configValue){
+    async execute(configValue, prisonsBot){
         console.log('[MCHPB] Scheduling tasks...');
         try {
 

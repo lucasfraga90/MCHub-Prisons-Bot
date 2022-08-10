@@ -4,7 +4,7 @@ module.exports = {
     data: {
         name: 'global_booster'
     },
-    async execute(regexMatches, discordBot, configValue, guildID){
+    async execute(regexMatches, guildID, configValue, discordBot){
         try {
     
             const globalBoosterAlertChannelID = configValue.discord_channel.global_booster;

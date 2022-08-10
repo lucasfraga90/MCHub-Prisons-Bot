@@ -4,7 +4,7 @@ module.exports = {
     data: {
         name: 'bloodbath_started'
     },
-    async execute(regexMatches, discordBot, configValue, guildID){    
+    async execute(regexMatches, guildID, configValue, discordBot){    
         try {
     
             const bloodbathStartedAlertChannelID = configValue.discord_channel.bloodbath_started;

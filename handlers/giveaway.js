@@ -4,7 +4,7 @@ module.exports = {
     data: {
         name: 'giveaway'
     },
-    async execute(regexMatches, discordBot, configValue, guildID){
+    async execute(regexMatches, guildID, configValue, discordBot){
         try {
 
             console.log(regexMatches)
