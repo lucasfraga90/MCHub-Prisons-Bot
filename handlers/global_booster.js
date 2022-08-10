@@ -106,9 +106,8 @@ module.exports = {
                     
                     break;
             }
-            if(underscoreRegex.test(globalBoosterOwner) !== false){
-                globalBoosterOwner = globalBoosterOwner.replace(underscoreRegex, `\\_`);
-            }
+
+            globalBoosterOwner = globalBoosterOwner.replace(underscoreRegex, `\\_`);
 
             const globalBoosterEmbedDescription =
 

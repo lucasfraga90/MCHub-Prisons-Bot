@@ -33,19 +33,17 @@ module.exports = {
                     prisonsBot.chat('/nextbloodbath');
                 }, 3600000);
             }
-            await scheduleAutoJoinRealm().then(() => {
-                scheduleAutoReconnectToRealm().then(() => {
-                    scheduleUpcomingPvEBoss().then(() => {
-                        scheduleUpcomingDungeon().then(() => {
-                            scheduleUpcomingBloodbath().then(() => {
-                            });
+            await scheduleAutoJoinRealm().then(async () => {
+                await scheduleAutoReconnectToRealm().then(async () => {
+                    await scheduleUpcomingPvEBoss().then(async () => {
+                        await scheduleUpcomingDungeon().then(async () => {
+                            await scheduleUpcomingBloodbath();
                         });
                     });
                 });
             });
             return true;
         } catch(scheduleTaskError) {
-            console.log('[MCHPB] Error occured while scheduling tasks! Restarting prisons bot...');
             return scheduleTaskError;   
         }
     }
