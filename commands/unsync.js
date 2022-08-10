@@ -13,21 +13,23 @@ module.exports = {
 			let discordSlashCommandResult;
 
 			if(discordSlashCommandDetails.member.roles.cache.some(discordSlashCommandUserRole => discordSlashCommandUserRole.id === prisonsBotVerifiedUserRoleID) === true){
-				await discordSlashCommandDetails.member.roles.remove(prisonsBotVerifiedUserRoleID).then(() => {
-					discordSlashCommandDetails.editReply({ content: '```Unverification success.```', ephemeral: true });
+				await discordSlashCommandDetails.member.roles.remove(prisonsBotVerifiedUserRoleID).then(async () => {
+					await discordSlashCommandDetails.editReply({ content: '```Unverification success.```', ephemeral: true }).then(() => {
 
-					discordSlashCommandResult = true;
+						discordSlashCommandResult = true;
 
-				}).catch(() => {
-					discordSlashCommandDetails.editReply({ content: '```Error occured while unverifying!```', ephemeral: true });
+					});
+				}).catch(async () => {
+					await discordSlashCommandDetails.editReply({ content: '```Error occured while unverifying!```', ephemeral: true }).then(() => {
 
-					discordSlashCommandResult = 'ERROR';
+						discordSlashCommandResult = 'ERROR';
 
+					});
 				});
 			} else {
 				await discordSlashCommandDetails.editReply({ content: '```You are already an unverified prisons bot user!```', ephemeral: true }).then(() => {
 
-					discordSlashCommandResult = false;
+					discordSlashCommandResult = false;					
 
 				});
 			}

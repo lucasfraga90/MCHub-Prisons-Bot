@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('balance')
-		.setDescription("Shows A Player's E-Token/Beacon/Boss Credit/Omnitool Rename Balance.")
+		.setDescription("Shows A Player's E-Token/Beacon/Boss Credit/Pearl/Omnitool Rename Balance.")
 		.setDMPermission(false)
 		.addSubcommand(e_token => 
 			e_token.setName('e-token')
@@ -55,30 +55,42 @@ module.exports = {
 
 			const playerIGN = discordSlashCommandDetails.options.getString('player-ign');
 
-			const playerIGNRegex = new RegExp(/^([0-9A-Za-z_*]+)$/, 'm');
+			let playerIGNRegex;
+			
+			if(String(playerIGN).startsWith('*') === true){
+
+				playerIGNRegex = new RegExp(/^\*([0-9A-Za-z_]+)$/, 'm');
+
+			} else {
+
+				playerIGNRegex = new RegExp(/^([0-9A-Za-z_]+)$/, 'm');
+
+			}
 
 			if(playerIGNRegex.test(playerIGN) === false){
 				await discordSlashCommandDetails.editReply({ content: '```' + `${playerIGN} is not a valid Minecraft Username!` + '```', ephemeral: true });
 				return false;
 			}
 			
-			const subCommand = discordSlashCommandDetails.options.getSubcommand();
+			const discordSlashSubCommand = discordSlashCommandDetails.options.getSubcommand();
 
 			let discordSlashCommandResult;
 
-			switch(subCommand){
+			switch(discordSlashSubCommand){
 				case 'e-token':
 					
 					const playerETokenBalanceMessageStringRegex = `^MCHUB \» ${playerIGN} has ([0-9,]+) E-Tokens\!`;
 
 					const playerETokenBalanceMessageRegex = new RegExp(playerETokenBalanceMessageStringRegex, 'm');
 
-					const getPlayerETokenBalanceMessage = prisonsBot.findMessage(5000, playerETokenBalanceMessageRegex).then(getPlayerETokenBalanceMessageResult => {
+					const getPlayerETokenBalanceMessage = prisonsBot.findMessage(3000, playerETokenBalanceMessageRegex).then(async getPlayerETokenBalanceMessageResult => {
+
 						if(getPlayerETokenBalanceMessageResult === false){
-							discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s e-token balance!` + '```', ephemeral: true });
+							await discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s e-token balance!` + '```', ephemeral: true }).then(() => {
+								
+								discordSlashCommandResult = false;
 
-							discordSlashCommandResult = false;
-
+							});
 						} else {
 
 							const playerETokenBalanceDetails = String(getPlayerETokenBalanceMessageResult).match(playerETokenBalanceMessageRegex);
@@ -87,14 +99,15 @@ module.exports = {
 
 							const playerETokenBalanceInfo = `IGN: ${playerIGN} | E-Token Balance: ${playerETokenBalance}`;
 
-							discordSlashCommandDetails.editReply({ content: '```' + playerETokenBalanceInfo + '```', ephemeral: true });
+							await discordSlashCommandDetails.editReply({ content: '```' + playerETokenBalanceInfo + '```', ephemeral: true }).then(() => {
 
-							discordSlashCommandResult = true;
+								discordSlashCommandResult = true;
 
+							});
 						}
 					});
 
-					await prisonsBot.chat(`/etokensbal ${playerIGN}`);
+					prisonsBot.chat(`/etokensbal ${playerIGN}`);
 					await getPlayerETokenBalanceMessage;
 					break;
 				case 'beacon':
@@ -103,12 +116,14 @@ module.exports = {
 
 					const playerBeaconBalanceMessageRegex = new RegExp(playerBeaconBalanceMessageStringRegex, 'm');
 
-					const getPlayerBeaconBalanceMessage = prisonsBot.findMessage(5000, playerBeaconBalanceMessageRegex).then(getPlayerBeaconBalanceMessageResult => {
-						if(getPlayerBeaconBalanceMessageResult === false){
-							discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s beacon balance!` + '```', ephemeral: true });
-						
-							discordSlashCommandResult = false;
+					const getPlayerBeaconBalanceMessage = prisonsBot.findMessage(3000, playerBeaconBalanceMessageRegex).then(async getPlayerBeaconBalanceMessageResult => {
 
+						if(getPlayerBeaconBalanceMessageResult === false){
+							await discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s beacon balance!` + '```', ephemeral: true }).then(() => {
+								
+								discordSlashCommandResult = false;
+
+							});
 						} else {
 							const playerBeaconBalanceDetails = String(getPlayerBeaconBalanceMessageResult).match(playerBeaconBalanceMessageRegex);
 
@@ -116,14 +131,15 @@ module.exports = {
 
 							const playerBeaconBalanceInfo = `IGN: ${playerIGN} | Beacon Balance: ${playerBeaconBalance}`;
 
-							discordSlashCommandDetails.editReply({ content: '```' + playerBeaconBalanceInfo + '```', ephemeral: true });
-					
-							discordSlashCommandResult = true;
-							
+							await discordSlashCommandDetails.editReply({ content: '```' + playerBeaconBalanceInfo + '```', ephemeral: true }).then(() => {
+								
+								discordSlashCommandResult = true;
+
+							});
 						}
 					});
 
-					await prisonsBot.chat(`/beaconsbal ${playerIGN}`);
+					prisonsBot.chat(`/beaconsbal ${playerIGN}`);
 					await getPlayerBeaconBalanceMessage;
 					break;
 				case 'boss-credit':
@@ -132,12 +148,14 @@ module.exports = {
 
 					const playerBossCreditBalanceMessageRegex = new RegExp(playerBossCreditBalanceMessageStringRegex, 'm');
 
-					const getPlayerBossCreditBalanceMessage = prisonsBot.findMessage(5000, playerBossCreditBalanceMessageRegex).then(getPlayerBossCreditBalanceMessageResult => {
+					const getPlayerBossCreditBalanceMessage = prisonsBot.findMessage(3000, playerBossCreditBalanceMessageRegex).then(async getPlayerBossCreditBalanceMessageResult => {
+						
 						if(getPlayerBossCreditBalanceMessageResult === false){
-							discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s boss credit balance!` + '```', ephemeral: true });
-					
-							discordSlashCommandResult = false;
+							await discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s boss credit balance!` + '```', ephemeral: true }).then(() => {
 
+								discordSlashCommandResult = false;
+
+							});
 						} else {
 
 							const playerBossCreditBalanceDetails = String(getPlayerBossCreditBalanceMessageResult).match(playerBossCreditBalanceMessageRegex);
@@ -146,14 +164,15 @@ module.exports = {
 
 							const playerBossCreditBalanceInfo = `IGN: ${playerIGN} | Boss Credit Balance: ${playerBossCreditBalance}`;
 
-							discordSlashCommandDetails.editReply({ content: '```' + playerBossCreditBalanceInfo + '```', ephemeral: true });
+							await discordSlashCommandDetails.editReply({ content: '```' + playerBossCreditBalanceInfo + '```', ephemeral: true }).then(() => {
 
-							discordSlashCommandResult = true;
+								discordSlashCommandResult = true;
 
+							});
 						}
 					});
 
-					await prisonsBot.chat(`/bosscreditsbal ${playerIGN}`);
+					prisonsBot.chat(`/bosscreditsbal ${playerIGN}`);
 					await getPlayerBossCreditBalanceMessage;
 					break;
 				case 'pearl':
@@ -162,12 +181,14 @@ module.exports = {
 	
 					const playerPearlBalanceMessageRegex = new RegExp(playerPearlBalanceMessageStringRegex, 'm');
 	
-					const getPlayerPearlBalanceMessage = prisonsBot.findMessage(5000, playerPearlBalanceMessageRegex).then(getPlayerPearlBalanceMessageResult => {
-						if(getPlayerPearlBalanceMessageResult === false){
-							discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s pearl balance!` + '```', ephemeral: true });
-					
-							discordSlashCommandResult = false;
+					const getPlayerPearlBalanceMessage = prisonsBot.findMessage(3000, playerPearlBalanceMessageRegex).then(async getPlayerPearlBalanceMessageResult => {
 
+						if(getPlayerPearlBalanceMessageResult === false){
+							await discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s pearl balance!` + '```', ephemeral: true }).then(() => {
+								
+								discordSlashCommandResult = false;
+
+							});
 						} else {
 
 							const playerPearlBalanceDetails = String(getPlayerPearlBalanceMessageResult).match(playerPearlBalanceMessageRegex);
@@ -176,14 +197,15 @@ module.exports = {
 	
 							const playerPearlBalanceInfo = `IGN: ${playerIGN} | Pearl Balance: ${playerPearlBalance}`;
 	
-							discordSlashCommandDetails.editReply({ content: '```' + playerPearlBalanceInfo + '```', ephemeral: true });
-					
-							discordSlashCommandResult = true;
+							await discordSlashCommandDetails.editReply({ content: '```' + playerPearlBalanceInfo + '```', ephemeral: true }).then(() => {
 
+								discordSlashCommandResult = true;
+
+							});
 						}
 					});
 	
-					await prisonsBot.chat(`/pearlbal ${playerIGN}`);
+					prisonsBot.chat(`/pearlbal ${playerIGN}`);
 					await getPlayerPearlBalanceMessage;
 					break;
 				case 'omnitool-rename':
@@ -192,12 +214,14 @@ module.exports = {
 	
 					const playerOmnitoolRenameBalanceMessageRegex = new RegExp(playerOmnitoolRenameBalanceMessageStringRegex, 'm');
 	
-					const getPlayerOmnitoolRenameBalanceMessage = prisonsBot.findMessage(5000, playerOmnitoolRenameBalanceMessageRegex).then(getPlayerOmnitoolRenameBalanceMessageResult => {
-						if(getPlayerOmnitoolRenameBalanceMessageResult === false){
-							discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s omnitool rename balance!` + '```', ephemeral: true });
-					
-							discordSlashCommandResult = false;
+					const getPlayerOmnitoolRenameBalanceMessage = prisonsBot.findMessage(3000, playerOmnitoolRenameBalanceMessageRegex).then(async getPlayerOmnitoolRenameBalanceMessageResult => {
 
+						if(getPlayerOmnitoolRenameBalanceMessageResult === false){
+							await discordSlashCommandDetails.editReply({ content: '```' + `Error occured while obtaining ${playerIGN}'s omnitool rename balance!` + '```', ephemeral: true }).then(() => {
+
+								discordSlashCommandResult = false;
+
+							});
 						} else {
 
 							const playerOmnitoolRenameBalanceDetails = String(getPlayerOmnitoolRenameBalanceMessageResult).match(playerOmnitoolRenameBalanceMessageRegex);
@@ -206,14 +230,15 @@ module.exports = {
 	
 							const playerOmnitoolRenameBalanceInfo = `IGN: ${playerIGN} | Omnitool Rename Balance: ${playerOmnitoolRenameBalance}`;
 	
-							discordSlashCommandDetails.editReply({ content: '```' + playerOmnitoolRenameBalanceInfo + '```', ephemeral: true });
-					
-							discordSlashCommandResult = true;
+							await discordSlashCommandDetails.editReply({ content: '```' + playerOmnitoolRenameBalanceInfo + '```', ephemeral: true }).then(() => {
 
+								discordSlashCommandResult = true;
+
+							});
 						}
 					});
 	
-					await prisonsBot.chat(`/renamesbal ${playerIGN}`);
+					prisonsBot.chat(`/renamesbal ${playerIGN}`);
 					await getPlayerOmnitoolRenameBalanceMessage;
 					break;
 			}

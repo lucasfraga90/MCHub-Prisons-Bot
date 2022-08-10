@@ -12,34 +12,39 @@ module.exports = {
 
 			const prisonsBotTrustedRoleID = configValue.role_id.bot_trusted;
 
-			const atlanticSeason = configValue.prisons_bot.season;
-
 			let discordSlashCommandResult;
 
 			if(discordSlashCommandDetails.member.roles.cache.some(discordSlashCommandUserRole => discordSlashCommandUserRole.id === prisonsBotAdminRoleID || discordSlashCommandUserRole.id === prisonsBotTrustedRoleID) === true){
 
+				const atlanticSeason = configValue.prisons_bot.season;
+
 				const reconnectSuccessMessage = `Attempting to send you to atlantic${atlanticSeason}...`;
 			
-				const reconnectToAtlanticPrisons = prisonsBot.findMessage(5000, reconnectSuccessMessage).then(reconnectToAtlanticPrisonsResult => {
+				const reconnectToAtlanticPrisons = prisonsBot.findMessage(3000, reconnectSuccessMessage).then(async reconnectToAtlanticPrisonsResult => {
+
 					if(reconnectToAtlanticPrisonsResult === false){
-						discordSlashCommandDetails.editReply({ content: '```Error occured while reconnecting to Atlantic Prisons!```', ephemeral: true });
+						await discordSlashCommandDetails.editReply({ content: '```Error occured while reconnecting to Atlantic Prisons!```', ephemeral: true }).then(() => {
 
-						discordSlashCommandResult = false;
+							discordSlashCommandResult = false;
 
+						});
 					} else {
-						discordSlashCommandDetails.edit({ content: '```' + reconnectToAtlanticPrisonsResult + '```', ephemeral: true });
+						await discordSlashCommandDetails.edit({ content: '```' + reconnectToAtlanticPrisonsResult + '```', ephemeral: true }).then(() => {
 
-						discordSlashCommandResult = true;
+							discordSlashCommandResult = true;
 
+						});
 					}
 				});
-				await prisonsBot.chat(`/server atlantic${atlanticSeason}`);
+
+				prisonsBot.chat(`/server atlantic${atlanticSeason}`);
 				await reconnectToAtlanticPrisons;
 			} else {
-				await discordSlashCommandDetails.editReply({ content: '```You are not allowed to run this command!```', ephemeral: true });
-				
-				discordSlashCommandResult = false;
+				await discordSlashCommandDetails.editReply({ content: '```You are not allowed to run this command!```', ephemeral: true }).then(() => {
 
+					discordSlashCommandResult = false;
+					
+				});
 			}
 			return discordSlashCommandResult;
 		} catch {

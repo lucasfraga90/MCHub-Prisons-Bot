@@ -23,8 +23,17 @@ module.exports = {
 
 			const playerIGN = discordSlashCommandDetails.options.getString('player-ign');
 
-			const playerIGNRegex = new RegExp(/^([0-9A-Za-z_*]+)$/, 'm');
+			let playerIGNRegex;
+			
+			if(String(playerIGN).startsWith('*') === true){
 
+				playerIGNRegex = new RegExp(/^\*([0-9A-Za-z_]+)$/, 'm');
+
+			} else {
+
+				playerIGNRegex = new RegExp(/^([0-9A-Za-z_]+)$/, 'm');
+
+			}
 			if(playerIGNRegex.test(playerIGN) === false){
 				await discordSlashCommandDetails.editReply({ content: '```' + `${playerIGN} is not a valid Minecraft Username!` + '```', ephemeral: true });
 				return false;
@@ -46,34 +55,38 @@ module.exports = {
 
 			const prisonsBotIGN = prisonsBot.username;
 
-			await discordSlashCommandDetails.editReply({ content: '```' + `Verification Code: ${userVerificationCode} | Ingame Command: /msg ${prisonsBotIGN} ${userVerificationCode} | You Have 30 Seconds To Verify.` + '```', ephemeral: true });
-			
 			let discordSlashCommandResult;
 
-			const getUserVerificationMessage = prisonsBot.findMessage(30000, userVerificationMessage).then(async userVerificationMessageResult => {
+			await discordSlashCommandDetails.editReply({ content: '```' + `Verification Code: ${userVerificationCode} | Ingame Command: /msg ${prisonsBotIGN} ${userVerificationCode} | You Have 30 Seconds To Verify.` + '```', ephemeral: true }).then(async () => {
 
-				if(userVerificationMessageResult === false){
-					await discordSlashCommandDetails.editReply({ content: '```Verication failed!```', ephemeral: true });
+				const getUserVerificationMessage = prisonsBot.findMessage(30000, userVerificationMessage).then(async userVerificationMessageResult => {
 
-					discordSlashCommandResult = false;
+					if(userVerificationMessageResult === false){
+						await discordSlashCommandDetails.editReply({ content: '```Verication failed!```', ephemeral: true }).then(() => {
 
-				} else {
-					await discordSlashCommandDetails.member.roles.add(prisonsBotVerifiedUserRoleID).then(() => {
-						prisonsBot.chat(`/msg ${playerIGN} Verification success.`);
-						discordSlashCommandDetails.editReply({ content: '```Verication success.```', ephemeral: true });
+							discordSlashCommandResult = false;
 
-						discordSlashCommandResult = true;
+						});
+					} else {
+						await discordSlashCommandDetails.member.roles.add(prisonsBotVerifiedUserRoleID).then(async () => {
+							await discordSlashCommandDetails.editReply({ content: '```Verication success.```', ephemeral: true }).then(() => {
+								prisonsBot.chat(`/msg ${playerIGN} Verification success.`);
 
-					}).catch(() => {
-						discordSlashCommandDetails.editReply({ content: '```Error occured while verifying!```', ephemeral:true });
+								discordSlashCommandResult = true;
 
-						discordSlashCommandResult = 'ERROR';
-						
-					});
-				}
+							});
+						}).catch(async () => {
+							await discordSlashCommandDetails.editReply({ content: '```Error occured while verifying!```', ephemeral:true }).then(() => {
+								
+								discordSlashCommandResult = 'ERROR';
+
+							});
+						});
+					}
+				});
+	
+				await getUserVerificationMessage;
 			});
-
-			await getUserVerificationMessage;
             return discordSlashCommandResult;
 		} catch {
 			await discordSlashCommandDetails.editReply({ content: '```Error occured while executing this command!```', ephemeral: true });
