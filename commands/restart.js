@@ -18,26 +18,27 @@ module.exports = {
 						prisonsBot.end();
 						await discordSlashCommandDetails.editReply({content: '```Disconnected from MCHub.COM.```', ephemeral: true }).then(async () => {
 							console.log('[MCHPB] Disconnected from MCHub.COM.');
-							logDiscordSlashCommandUsage(discordSlashCommandDetails, true);
-							await discordSlashCommandDetails.editReply({content: '```Restarting prisons bot...```', ephemeral: true }).then(() => {
-								console.log('[MCHPB] Disconnecting from the Discord Bot...');
-								discordBot.destroy();
-								console.log('[MCHPB] Disconnected from the Discord Bot.');
-								return process.exit(0);
+							await logDiscordSlashCommandUsage(discordSlashCommandDetails, true).then(async () => {
+								await discordSlashCommandDetails.editReply({content: '```Restarting prisons bot...```', ephemeral: true }).then(() => {
+									console.log('[MCHPB] Disconnecting from the Discord Bot...');
+									discordBot.destroy();
+									console.log('[MCHPB] Disconnected from the Discord Bot.');
+									return process.exit(0);
+								});
 							});
 						});
 					});
 				});
 			} else {
-				await discordSlashCommandDetails.editReply({ content: '```You are not allowed to run this command!```', ephemeral: true }).then(() => {
-					logDiscordSlashCommandUsage(discordSlashCommandDetails, false);
+				await discordSlashCommandDetails.editReply({ content: '```You are not allowed to run this command!```', ephemeral: true }).then(async () => {
+					await logDiscordSlashCommandUsage(discordSlashCommandDetails, false);
 				});
 			}
 			return;
 		} catch {
 			console.log('[MCHPB] Error occured while restarting prisons bot! Force restarting prisons bot...');
-			await discordSlashCommandDetails.editReply({ content: '```Error occured while executing this command! Force restarting prisons bot...```', ephemeral: true }).then(() => {
-				logDiscordSlashCommandUsage(discordSlashCommandDetails, 'ERROR');
+			await discordSlashCommandDetails.editReply({ content: '```Error occured while executing this command! Force restarting prisons bot...```', ephemeral: true }).then(async () => {
+				await logDiscordSlashCommandUsage(discordSlashCommandDetails, 'ERROR');
 			});
 			return process.exit(0);
 		}
