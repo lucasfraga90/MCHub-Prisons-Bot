@@ -4,10 +4,8 @@ module.exports = {
     data: {
         name: 'giveaway'
     },
-    async execute(regexMatches, guildID, configValue, discordBot){
+    async execute(regexMatches, guildID, clientID, configValue, discordBot){
         try {
-
-            console.log(regexMatches)
 
             const giveawayAlertChannelID = configValue.discord_channel.giveaway;
 
@@ -19,9 +17,9 @@ module.exports = {
 
             const giveawayDate = giveawayDetails[1];
 
-            const underscoreRegex = new RegExp(/([_])/, 'g');
-
             const giveawayWinners = String(giveawayDetails[2]).split(', ');
+
+            const underscoreRegex = new RegExp(/([_])/, 'g');
 
             let giveawayEmbedDescription = '';
 
@@ -44,8 +42,8 @@ module.exports = {
                 .setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
         
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(giveawayAlertChannelID) !== undefined){
-                if(discordBot.guilds.cache.get(guildID).channels.cache.get(giveawayAlertChannelID).permissionsFor(discordBot.user.id).has('ViewChannel') === true){
-                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(giveawayAlertChannelID).permissionsFor(discordBot.user.id).has('SendMessages') === true){
+                if(discordBot.guilds.cache.get(guildID).channels.cache.get(giveawayAlertChannelID).permissionsFor(clientID).has('ViewChannel') === true){
+                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(giveawayAlertChannelID).permissionsFor(clientID).has('SendMessages') === true){
                         await discordBot.guilds.cache.get(guildID).channels.cache.get(giveawayAlertChannelID).send({ embeds: [giveawayEmbed] });
                         return true;
                     } else {

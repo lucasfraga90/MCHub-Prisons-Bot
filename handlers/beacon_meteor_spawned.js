@@ -4,7 +4,7 @@ module.exports = {
     data: {
         name: 'beacon_meteor_spawned'
     },
-    async execute(regexMatches, guildID, configValue, discordBot){
+    async execute(regexMatches, guildID, clientID, configValue, discordBot){
         try {
     
             const beaconMeteorSpawnedAlertChannelID = configValue.discord_channel.beacon_meteor_spawned;
@@ -21,8 +21,8 @@ module.exports = {
                 .setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
 
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID) !== undefined){
-                if(discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).permissionsFor(discordBot.user.id).has('ViewChannel') === true){
-                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).permissionsFor(discordBot.user.id).has('SendMessages') === true){
+                if(discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).permissionsFor(clientID).has('ViewChannel') === true){
+                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).permissionsFor(clientID).has('SendMessages') === true){
                         await discordBot.guilds.cache.get(guildID).channels.cache.get(beaconMeteorSpawnedAlertChannelID).send({ content: `|| <@&${beaconMeteorSpawnedPingRoleID}> ||`, embeds: [beaconMeteorSpawnedEmbed] });
                         return true;
                     } else {

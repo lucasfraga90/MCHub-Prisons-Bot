@@ -4,7 +4,7 @@ module.exports = {
     data: {
         name: 'global_booster'
     },
-    async execute(regexMatches, guildID, configValue, discordBot){
+    async execute(regexMatches, guildID, clientID, configValue, discordBot){
         try {
     
             const globalBoosterAlertChannelID = configValue.discord_channel.global_booster;
@@ -23,17 +23,17 @@ module.exports = {
 
             const underscoreRegex = new RegExp(/([_])/, 'g');
 
-            let globalBoosterOwner = globalBoosterDetails[0];
+            const globalBoosterOwner = String(globalBoosterDetails[0]).replace(underscoreRegex, `\\_`);
 
-            let globalBoosterThumbnailURL;
+            let globalBoosterThumbnailURL = 'https://i.imgur.com/3ovjQst.png';
 
             function isGBoosterImportant(){
 
-                const globalBoosterMinutes = globalBoosterDuration.match(new RegExp(/^([0-9]+) minutes/, 'm'));
+                const globalBoosterMinutesRegexMatches = globalBoosterDuration.match(new RegExp(/^([0-9]+) minutes/, 'm'));
 
-                const globalBoosterHour = globalBoosterDuration.match(/^([0-9]+) (hours||hour)/, 'm');
+                const globalBoosterHoursRegexMatches = globalBoosterDuration.match(/^([0-9]+) (hours||hour)/, 'm');
 
-                if(globalBoosterHour !== null){
+                if(globalBoosterHoursRegexMatches !== null){
                     switch(globalBoosterType){
                         default:
                             return false;
@@ -44,16 +44,10 @@ module.exports = {
                         case 'E-Token':
                             return true;
                             break;
-                        case 'Lucky':
-                            return false;
-                            break;
-                        case 'Quarry':
-                            return false;
-                            break;
                     }
                 } else {
-                    if(globalBoosterMinutes !== null){
-                        if(globalBoosterMinutes[1] >= 10){
+                    if(globalBoosterMinutesRegexMatches !== null){
+                        if(globalBoosterMinutesRegexMatches[1] >= 10){
                             switch(globalBoosterType){
                                 default:
                                     return false;
@@ -63,12 +57,6 @@ module.exports = {
                                     break;
                                 case 'E-Token':
                                     return true;
-                                    break;
-                                case 'Lucky':
-                                    return false;
-                                    break;
-                                case 'Quarry':
-                                    return false;
                                     break;
                             }
                         } else {
@@ -80,11 +68,6 @@ module.exports = {
                 }
             }
             switch(globalBoosterType){
-                default:
-
-                    globalBoosterThumbnailURL = 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/322/exclamation-mark_2757.png';
-                    
-                    break;
                 case 'E-Token':
 
                     globalBoosterThumbnailURL = 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/08/Magma_Cream_JE3_BE2.png/revision/latest?cb=20190501035730';
@@ -107,8 +90,6 @@ module.exports = {
                     break;
             }
 
-            globalBoosterOwner = globalBoosterOwner.replace(underscoreRegex, `\\_`);
-
             const globalBoosterEmbedDescription =
 
             `Owner: ${globalBoosterOwner}
@@ -125,8 +106,8 @@ module.exports = {
                 .setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
     
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(globalBoosterAlertChannelID) !== undefined){
-                if(discordBot.guilds.cache.get(guildID).channels.cache.get(globalBoosterAlertChannelID).permissionsFor(discordBot.user.id).has('ViewChannel') === true){
-                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(globalBoosterAlertChannelID).permissionsFor(discordBot.user.id).has('SendMessages') === true){
+                if(discordBot.guilds.cache.get(guildID).channels.cache.get(globalBoosterAlertChannelID).permissionsFor(clientID).has('ViewChannel') === true){
+                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(globalBoosterAlertChannelID).permissionsFor(clientID).has('SendMessages') === true){
                         if(isGBoosterImportant() === true){
                             await discordBot.guilds.cache.get(guildID).channels.cache.get(globalBoosterAlertChannelID).send({ content: `|| <@&${globalBoosterPingRoleID}> ||`, embeds: [globalBoosterEmbed] });
                         } else {

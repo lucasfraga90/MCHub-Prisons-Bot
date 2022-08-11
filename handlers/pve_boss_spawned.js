@@ -4,7 +4,7 @@ module.exports = {
     data: {
         name: 'pve_boss_spawned'
     },
-    async execute(regexMatches, guildID, configValue, discordBot){
+    async execute(regexMatches, guildID, clientID, configValue, discordBot){
         try {
 
             const pveBossSpawnedAlertChannelID = configValue.discord_channel.pve_boss_spawned;
@@ -17,26 +17,26 @@ module.exports = {
 
             const pveBossName = String(pveBossDetails[1]);
 
-            let pveBossType = pveBossDetails[0], pveBossSpawnedThumbnailURL;
+            let pveBossType = pveBossDetails[0], pveBossSpawnedThumbnailURL = 'https://i.imgur.com/3ovjQst.png';
 
             switch(pveBossType){
                 default:
-                    pveBossType = 'BOSS';
+
+                    pveBossType = 'UNKNOWN';
+
                     break;
                 case 'Boss':
+
                     pveBossType = 'NORMAL';
-                    break;
-                case 'ENRAGED':
-                    pveBossType = 'ENRAGED';
-                    break;
-            }
-
-            switch(pveBossName){
-                default:
-
-                    pveBossSpawnedThumbnailURL = 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/322/skull-and-crossbones_2620-fe0f.png';
                     
                     break;
+                case 'ENRAGED':
+                    
+                    pveBossType = 'ENRAGED';
+                    
+                    break;
+            }
+            switch(pveBossName){
                 case 'Estranged Witch':
 
                     pveBossSpawnedThumbnailURL = 'https://lh3.googleusercontent.com/7MyHfZSgZ6gCrfjSkaoLLw6pUBV2gwelUOVIngWjeRiE4CZ30aRAwMeOj8-9nlRuv29hjDlNmaU0R5Pm7wCgvzF6oMGvZP2dtAurEcg=w600';
@@ -73,8 +73,8 @@ module.exports = {
                 .setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
     
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID) !== undefined){
-                if(discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).permissionsFor(discordBot.user.id).has('ViewChannel') === true){
-                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).permissionsFor(discordBot.user.id).has('SendMessages') === true){
+                if(discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).permissionsFor(clientID).has('ViewChannel') === true){
+                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).permissionsFor(clientID).has('SendMessages') === true){
                         await discordBot.guilds.cache.get(guildID).channels.cache.get(pveBossSpawnedAlertChannelID).send({ content: `|| <@&${pveBossSpawnedPingRoleID}> ||`, embeds: [pveBossSpawnedEmbed] });
                         return true;
                     } else {
