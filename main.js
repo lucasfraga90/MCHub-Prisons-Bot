@@ -211,10 +211,10 @@ function generateEnvFile(){
 function isEnvFileValid(){
     console.log('[MCHPB] Validating .env file...');
     try {
-        if(process.env.DISCORD_BOT_TOKEN === undefined || process.env.INGAME_BOT_EMAIL === undefined || process.env.INGAME_BOT_PASSWORD === undefined){
+        if(process.env.DISCORD_BOT_TOKEN === undefined || process.env.PRISONS_BOT_EMAIL === undefined || process.env.PRISONS_BOT_PASSWORD === undefined){
             return false;
         } else {
-            if(process.env.DISCORD_BOT_TOKEN === 'DISCORD_BOT_TOKEN_HERE' || process.env.INGAME_BOT_EMAIL === 'INGAME_BOT_EMAIL_HERE' || process.env.INGAME_BOT_PASSWORD === 'INGAME_BOT_PASSWORD_HERE'){
+            if(process.env.DISCORD_BOT_TOKEN === 'DISCORD_BOT_TOKEN_HERE' || process.env.PRISONS_BOT_EMAIL === 'PRISONS_BOT_EMAIL_HERE' || process.env.PRISONS_BOT_PASSWORD === 'PRISONS_BOT_PASSWORD_HERE'){
                 return false;
             } else {
                 return true;
@@ -403,7 +403,7 @@ try {
                 }
             });
 
-            prisonsBot = mineflayer.createBot({ host: 'MCHub.COM', version: '1.18.2', username: process.env.INGAME_BOT_EMAIL, password: process.env.INGAME_BOT_PASSWORD, auth: 'microsoft', keepAlive: true, checkTimeoutInterval: 60000 });
+            prisonsBot = mineflayer.createBot({ host: 'MCHub.COM', version: '1.18.2', username: process.env.PRISONS_BOT_EMAIL, password: process.env.PRISONS_BOT_PASSWORD, auth: 'microsoft', keepAlive: true, checkTimeoutInterval: 60000 });
 
         } else {
             console.log('[MCHPB] Error occured while registering handlers! Force restarting prisons bot...');
@@ -1114,7 +1114,7 @@ Object.keys(chatEvents).forEach(async chatEventName => {
 
                 const chatEventHandler = handlers.get(chatEventName);
 
-                await chatEventHandler.execute(regexMatches, guildID, configValue, discordBot).then(async chatEventResult => {
+                await chatEventHandler.execute(regexMatches, guildID, clientID, configValue, discordBot).then(async chatEventResult => {
                     await logChatEvent(chatEventName, chatEventResult);
                 });
                 return;
