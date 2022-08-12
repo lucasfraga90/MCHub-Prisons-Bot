@@ -4,7 +4,7 @@ module.exports = {
     data: {
         name: 'upcoming_bloodbath'
     },
-    async execute(regexMatches, guildID, configValue, discordBot){    
+    async execute(regexMatches, guildID, clientID, configValue, discordBot){    
         try {
     
             const upcomingBloodbathAlertChannelID = configValue.discord_channel.upcoming_bloodbath;
@@ -26,8 +26,8 @@ module.exports = {
                 .setFooter({ text: 'Custom Coded By QimieGames', iconURL: 'https://images-ext-1.discordapp.net/external/HQFug-TJRekRG6wkhZL_wlEowWtUxuuR940ammbrz7k/https/cdn.discordapp.com/avatars/402039216487399447/347fd513aa2af9e8b4ac7ca80150b953.webp?width=115&height=115' });
 
             if(discordBot.guilds.cache.get(guildID).channels.cache.get(upcomingBloodbathAlertChannelID) !== undefined){
-                if(discordBot.guilds.cache.get(guildID).channels.cache.get(upcomingBloodbathAlertChannelID).permissionsFor(discordBot.user.id).has('ViewChannel') === true){
-                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(upcomingBloodbathAlertChannelID).permissionsFor(discordBot.user.id).has('SendMessages') === true){
+                if(discordBot.guilds.cache.get(guildID).channels.cache.get(upcomingBloodbathAlertChannelID).permissionsFor(clientID).has('ViewChannel') === true){
+                    if(discordBot.guilds.cache.get(guildID).channels.cache.get(upcomingBloodbathAlertChannelID).permissionsFor(clientID).has('SendMessages') === true){
                         await discordBot.guilds.cache.get(guildID).channels.cache.get(upcomingBloodbathAlertChannelID).send({ embeds: [upcomingBloodbathEmbed] });
                         return true;
                     } else {

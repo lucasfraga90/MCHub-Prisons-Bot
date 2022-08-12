@@ -1,6 +1,5 @@
 node_modules/
 error_logs/
 data/
-*.bat
 *.env
-config.json
+*.json
