@@ -38,8 +38,8 @@ const defaultConfigFileLayout =
   discord_channel: {
       global_chat: "1",
       private_message: "1",
-      chat_event: "1",
-      discord_slash_command_usage: "1",
+      chat_event_log: "1",
+      discord_slash_command_usage_log: "1",
       giveaway: "1",
       global_booster: "1",
       pve_boss_spawned: "1",
@@ -678,7 +678,7 @@ async function logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSl
         }
         if(configValue.feature.log_discord_slash_command_usage_to_discord === 'true'){
 
-            const discordSlashCommandLogChannelID = configValue.discord_channel.discord_slash_command_usage;
+            const discordSlashCommandLogChannelID = configValue.discord_channel.discord_slash_command_usage_log;
 
             const discordSlashCommandLogChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(discordSlashCommandLogChannelID).name;
 
@@ -1061,7 +1061,7 @@ async function logChatEvent(chatEventName, chatEventResult){
         }
         if(configValue.feature.log_chat_event_to_discord === 'true'){
 
-            const chatEventLogChannelID = configValue.discord_channel.chat_event;
+            const chatEventLogChannelID = configValue.discord_channel.chat_event_log;
 
             const chatEventLogChannelName = discordBot.guilds.cache.get(guildID).channels.cache.get(chatEventLogChannelID).name;
 
