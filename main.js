@@ -774,7 +774,7 @@ discordBot.on('interactionCreate', async discordSlashCommandDetails => {
                     await discordSlashCommandHandler.execute(discordSlashCommandDetails, configValue, discordBot, prisonsBot, logDiscordSlashCommandUsage);
                     break;
                 case 'stats':
-                    await discordSlashCommandHandler.execute().then(async discordSlashCommandResult => {
+                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, prisonsBot).then(async discordSlashCommandResult => {
                         await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
                     });
                     break;
