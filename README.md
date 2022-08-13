@@ -37,6 +37,9 @@
 #### 3. Run "MCHub Prisons Bot.exe".
 #### 4. Done, enjoy!
 
+## EXTRA INFORMATION
+#### 1. Please set up your prisons bot's ingame settings first before logging it in. (/toggles)
+
 ## [REPORT BUGS HERE](https://github.com/QimieGames/MCHub-Prisons-Bot/issues "Report Issue(s)/Bug(s)")
 
 ## [ABOUT ME](https://linktr.ee/qimiegames "Link To All My Stuffs")
