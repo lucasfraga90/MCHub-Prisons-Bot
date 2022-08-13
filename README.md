@@ -20,7 +20,7 @@
 
 ## REQUIREMENTS
 #### 1. Latest version of Node.js installed on your system. [[CLICK HERE](https://github.com/nodejs/node "Node.js")]
-#### 2. A migrated Minecraft account. [[CLICK HERE] (https//minecraft.net "Minecraft")]
+#### 2. A migrated Minecraft account. [[CLICK HERE](https//minecraft.net "Minecraft")]
 
 ## DEPENDENCIES
 #### 1. [Node.js](https://github.com/nodejs/node "Node.js")
