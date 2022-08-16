@@ -3,11 +3,11 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('stats')
-        .setDescription("Shows A Player's Prestige & Mine Rank/Blocks Broken Amount.")
+        .setDescription("Shows A Player's Prestige & Mine Rank/Blocks Broken Amount. [Verified User Command]")
         .setDMPermission(false)
         .addSubcommand(rank => 
             rank.setName('rank')
-            .setDescription("Shows A Player's Prestige & Mine Rank.")
+            .setDescription("Shows A Player's Prestige & Mine Rank. [Verified User Command]")
             .addStringOption(playerIGN => 
                 playerIGN.setName('player-ign')
                 .setDescription('Minecraft Username.')
@@ -16,15 +16,22 @@ module.exports = {
                 .setMaxLength(15)))
         .addSubcommand(blocks_broken =>
             blocks_broken.setName('blocks-broken')
-            .setDescription("Shows A Player's Blocks Broken Amount.")
+            .setDescription("Shows A Player's Blocks Broken Amount. [Verified User Command]")
             .addStringOption(playerIGN => 
                 playerIGN.setName('player-ign')
                 .setDescription('Minecraft Username.')
                 .setRequired(true)
                 .setMinLength(3)
                 .setMaxLength(15))),
-    async execute(discordSlashCommandDetails, prisonsBot){
+    async execute(discordSlashCommandDetails, configValue, prisonsBot){
         try {
+
+            const prisonsBotVerifiedRoleID = configValue.role_id.bot_verified;
+
+			if(discordSlashCommandDetails.member.roles.cache.some(discordSlashCommandUserRole => discordSlashCommandUserRole.id === prisonsBotVerifiedRoleID) !== true){
+				await discordSlashCommandDetails.editReply({ content: '```You are not allowed to run this command!```', ephemeral: true });
+				return false;
+			}
 
             const playerIGN = discordSlashCommandDetails.options.getString('player-ign');
 
@@ -40,7 +47,7 @@ module.exports = {
 
 			}
 
-			if(playerIGNRegex.test(playerIGN) === false){
+			if(playerIGNRegex.test(playerIGN) !== true){
 				await discordSlashCommandDetails.editReply({ content: '```' + `${playerIGN} is not a valid Minecraft Username!` + '```', ephemeral: true });
 				return false;
 			}

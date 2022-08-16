@@ -19,25 +19,40 @@ module.exports = {
                 }, 180000);
             }
             async function scheduleUpcomingPvEBoss(){
-                setInterval(async () => {
-                    prisonsBot.chat('/nextboss');
-                }, 300000);
+                if(configValue.feature.upcoming_pve_boss === 'true'){
+                    setInterval(async () => {
+                        prisonsBot.chat('/nextboss');
+                    }, 300000);
+                }
+            }
+            async function scheduleUpcomingProspector(){
+                if(configValue.feature.upcoming_prospector === 'true'){
+                    setInterval(async () => {
+                        prisonsBot.chat('/nextprospector');
+                    }, 600000);
+                }
             }
             async function scheduleUpcomingDungeon(){
-                setInterval(async () => {
-                    prisonsBot.chat('/nextdungeon');
-                }, 1800000);
+                if(configValue.feature.upcoming_dungeon === 'true'){
+                    setInterval(async () => {
+                        prisonsBot.chat('/nextdungeon');
+                    }, 1800000);
+                }
             }
             async function scheduleUpcomingBloodbath(){
-                setInterval(async () => {
-                    prisonsBot.chat('/nextbloodbath');
-                }, 3600000);
+                if(configValue.feature.upcoming_bloodbath === 'true'){
+                    setInterval(async () => {
+                        prisonsBot.chat('/nextbloodbath');
+                    }, 3600000);
+                }
             }
             await scheduleAutoJoinRealm().then(async () => {
                 await scheduleAutoReconnectToRealm().then(async () => {
                     await scheduleUpcomingPvEBoss().then(async () => {
-                        await scheduleUpcomingDungeon().then(async () => {
-                            await scheduleUpcomingBloodbath();
+                        await scheduleUpcomingProspector().then(async () => {
+                            await scheduleUpcomingDungeon().then(async () => {
+                                await scheduleUpcomingBloodbath();
+                            });
                         });
                     });
                 });

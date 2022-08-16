@@ -3,11 +3,11 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('balance')
-		.setDescription("Shows A Player's E-Token/Beacon/Boss Credit/Pearl/Omnitool Rename Balance.")
+		.setDescription("Shows A Player's E-Token/Beacon/Boss Credit/Pearl/Omnitool Rename Balance. [Verified User Command]")
 		.setDMPermission(false)
 		.addSubcommand(e_token => 
 			e_token.setName('e-token')
-			.setDescription("Shows A Player's E-Token Balance.")
+			.setDescription("Shows A Player's E-Token Balance. [Verified User Command]")
 			.addStringOption(playerIGN =>
 				playerIGN.setName('player-ign')
 				.setDescription('Minecraft Username.')
@@ -16,7 +16,7 @@ module.exports = {
 				.setMaxLength(15)))
 		.addSubcommand(beacon => 
 			beacon.setName('beacon')
-			.setDescription("Shows A Player's Beacon Balance.")
+			.setDescription("Shows A Player's Beacon Balance. [Verified User Command]")
 			.addStringOption(playerIGN =>
 				playerIGN.setName('player-ign')
 				.setDescription('Minecraft Username.')
@@ -25,7 +25,7 @@ module.exports = {
 				.setMaxLength(15)))
 		.addSubcommand(boss_credit => 
 			boss_credit.setName('boss-credit')
-			.setDescription("Shows A Player's Boss Credit Balance.")
+			.setDescription("Shows A Player's Boss Credit Balance. [Verified User Command]")
 			.addStringOption(playerIGN =>
 				playerIGN.setName('player-ign')
 				.setDescription('Minecraft Username.')
@@ -34,7 +34,7 @@ module.exports = {
 				.setMaxLength(15)))
 		.addSubcommand(pearl =>
 			pearl.setName('pearl')
-			.setDescription("Shows A Player's Pearl Balance.")
+			.setDescription("Shows A Player's Pearl Balance. [Verified User Command]")
 			.addStringOption(playerIGN =>
 				playerIGN.setName('player-ign')
 				.setDescription('Minecraft Username.')
@@ -43,15 +43,22 @@ module.exports = {
 				.setMaxLength(15)))
 		.addSubcommand(omnitool_rename => 
 			omnitool_rename.setName('omnitool-rename')
-			.setDescription("Shows A Player's Omnitool Rename Balance.")
+			.setDescription("Shows A Player's Omnitool Rename Balance. [Verified User Command]")
 			.addStringOption(playerIGN =>
 				playerIGN.setName('player-ign')
 				.setDescription('Minecraft Username.')
 				.setRequired(true)
 				.setMinLength(3)
 				.setMaxLength(15))),
-	async execute(discordSlashCommandDetails, prisonsBot){
+	async execute(discordSlashCommandDetails, configValue, prisonsBot){
 		try {
+
+			const prisonsBotVerifiedRoleID = configValue.role_id.bot_verified;
+
+			if(discordSlashCommandDetails.member.roles.cache.some(discordSlashCommandUserRole => discordSlashCommandUserRole.id === prisonsBotVerifiedRoleID) !== true){
+				await discordSlashCommandDetails.editReply({ content: '```You are not allowed to run this command!```', ephemeral: true });
+				return false;
+			}
 
 			const playerIGN = discordSlashCommandDetails.options.getString('player-ign');
 
@@ -67,7 +74,7 @@ module.exports = {
 
 			}
 
-			if(playerIGNRegex.test(playerIGN) === false){
+			if(playerIGNRegex.test(playerIGN) !== true){
 				await discordSlashCommandDetails.editReply({ content: '```' + `${playerIGN} is not a valid Minecraft Username!` + '```', ephemeral: true });
 				return false;
 			}
@@ -205,7 +212,7 @@ module.exports = {
 						}
 					});
 	
-					prisonsBot.chat(`/pearlbal ${playerIGN}`);
+					prisonsBot.chat(`/pearlsbal ${playerIGN}`);
 					await getPlayerPearlBalanceMessage;
 					break;
 				case 'omnitool-rename':

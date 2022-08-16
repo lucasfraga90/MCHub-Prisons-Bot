@@ -47,6 +47,7 @@ const defaultConfigFileLayout =
       dungeon_boss_spawned: "1",
       dungeon_opened: "1",
       upcoming_dungeon: "1",
+      upcoming_prospector: "1",
       beacon_meteor_spawned: "1",
       bloodbath_started: "1",
       upcoming_bloodbath: "1"
@@ -67,6 +68,7 @@ const defaultConfigFileLayout =
       dungeon_boss_spawned: "true",
       dungeon_opened: "true",
       upcoming_dungeon: "true",
+      upcoming_prospector: "true",
       beacon_meteor_spawned: "true",
       bloodbath_started: "true",
       upcoming_bloodbath: "true",
@@ -81,6 +83,7 @@ const defaultConfigFileLayout =
       upcoming_pve_boss_ping: "1",
       dungeon_boss_spawned_ping: "1",
       dungeon_opened_ping: "1",
+      upcoming_prospector_ping: "1",
       beacon_meteor_spawned_ping: "1",
       bloodbath_started_ping: "1"
   }
@@ -114,6 +117,7 @@ const chatEvents =
     dungeon_boss_spawned: new RegExp(/^Dungeons \» The dungeon boss has spawned\! There are ([0-9a-z ]+) left before the dungeon closes\!/, 'm'),
     dungeon_opened: new RegExp(/^Dungeons \» A new dungeon has opened\! You can join the dungeon by typing \/dungeon\!/, 'm'),
     upcoming_dungeon: new RegExp(/^Dungeons \» The next dungeon is scheduled to start in ([0-9a-z ]+)\!/, 'm'),
+    upcoming_prospector: new RegExp(/^MCHUB \» Prospector last procced at ([0-9a-z]+) ago\./, 'm'),
     beacon_meteor_spawned: new RegExp(/^BEACON \» A meteor has entered the atmosphere and is about to make impact\! Go to \/warp beacon to mine it up\!/, 'm'),
     bloodbath_started: new RegExp(/^BLOODBATH \» Bloodbath has started\! \/warp pvp/, 'm'),
     upcoming_bloodbath: new RegExp(/^BLOODBATH \» The next bloodbath is in ([0-9a-z ]+)\!/, 'm')
@@ -141,7 +145,7 @@ function doesImportantFilesExists(){
     console.log('[MCHPB] Loading important files...');
     try {
 
-        const defaultHandlerFiles = ['beacon_meteor_spawned.js', 'bloodbath_started.js', 'dungeon_boss_spawned.js', 'dungeon_opened.js', 'error.js', 'giveaway.js', 'global_booster.js', 'leaderboard.js', 'pve_boss_spawned.js', 'schedule_tasks.js', 'upcoming_bloodbath.js', 'upcoming_dungeon.js', 'upcoming_pve_boss.js'];
+        const defaultHandlerFiles = ['beacon_meteor_spawned.js', 'bloodbath_started.js', 'dungeon_boss_spawned.js', 'dungeon_opened.js', 'error.js', 'giveaway.js', 'global_booster.js', 'leaderboard.js', 'pve_boss_spawned.js', 'schedule_tasks.js', 'upcoming_bloodbath.js', 'upcoming_dungeon.js', 'upcoming_prospector.js', 'upcoming_pve_boss.js'];
 
         const defaultDiscordSlashCommandFiles = ['balance.js', 'help.js', 'leaderboard.js', 'reconnect.js', 'restart.js', 'stats.js', 'sync.js', 'unsync.js'];
 

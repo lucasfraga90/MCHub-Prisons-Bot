@@ -8,6 +8,7 @@
 #### - Upcoming PvE Boss & PvE Boss Spawned Alert.
 #### - Dungeon Boss Spawned Alert.
 #### - Upcoming Dungeon & Dungeon Opened Alert.
+#### - Upcoming Prospector Alert.
 #### - Beacon Meteor Spawned Alert.
 #### - Upcoming Bloodbath & Bloodbath Started Alert.
 #### - Check Ingame Leaderboard Through Discord. (Rank/Blocks Broken/Gang/E-Token/Beacon/Boss Credit/Pearl/Omnitool Rename)
