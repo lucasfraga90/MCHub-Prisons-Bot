@@ -117,7 +117,7 @@ const chatEvents =
     dungeon_boss_spawned: new RegExp(/^Dungeons \» The dungeon boss has spawned\! There are ([0-9a-z ]+) left before the dungeon closes\!/, 'm'),
     dungeon_opened: new RegExp(/^Dungeons \» A new dungeon has opened\! You can join the dungeon by typing \/dungeon\!/, 'm'),
     upcoming_dungeon: new RegExp(/^Dungeons \» The next dungeon is scheduled to start in ([0-9a-z ]+)\!/, 'm'),
-    upcoming_prospector: new RegExp(/^MCHUB \» Prospector last procced at ([0-9a-z]+) ago\./, 'm'),
+    upcoming_prospector: new RegExp(/^MCHUB \» Prospector last procced at ([0-9a-z ]+) ago\./, 'm'),
     beacon_meteor_spawned: new RegExp(/^BEACON \» A meteor has entered the atmosphere and is about to make impact\! Go to \/warp beacon to mine it up\!/, 'm'),
     bloodbath_started: new RegExp(/^BLOODBATH \» Bloodbath has started\! \/warp pvp/, 'm'),
     upcoming_bloodbath: new RegExp(/^BLOODBATH \» The next bloodbath is in ([0-9a-z ]+)\!/, 'm')
