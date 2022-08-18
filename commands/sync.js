@@ -11,7 +11,7 @@ module.exports = {
 			.setRequired(true)
 			.setMinLength(3)
 			.setMaxLength(15)),
-	async execute(discordSlashCommandDetails, prisonsBot, configValue){
+	async execute(discordSlashCommandDetails, configValue, prisonsBot){
 		try {
 
 			const prisonsBotVerifiedUserRoleID = configValue.role_id.bot_verified;

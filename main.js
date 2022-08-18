@@ -755,7 +755,7 @@ discordBot.on('interactionCreate', async discordSlashCommandDetails => {
 
             switch(discordSlashCommandDetails.commandName){
                 case 'balance':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, prisonsBot).then(async discordSlashCommandResult => {
+                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, configValue, prisonsBot).then(async discordSlashCommandResult => {
                         await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
                     });
                     break;
@@ -778,12 +778,12 @@ discordBot.on('interactionCreate', async discordSlashCommandDetails => {
                     await discordSlashCommandHandler.execute(discordSlashCommandDetails, configValue, discordBot, prisonsBot, logDiscordSlashCommandUsage);
                     break;
                 case 'stats':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, prisonsBot).then(async discordSlashCommandResult => {
+                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, configValue, prisonsBot).then(async discordSlashCommandResult => {
                         await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
                     });
                     break;
                 case 'sync':
-                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, prisonsBot, configValue).then(async discordSlashCommandResult => {
+                    await discordSlashCommandHandler.execute(discordSlashCommandDetails, configValue, prisonsBot).then(async discordSlashCommandResult => {
                         await logDiscordSlashCommandUsage(discordSlashCommandDetails, discordSlashCommandResult);
                     });
                     break;
